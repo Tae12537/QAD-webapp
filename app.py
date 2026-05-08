@@ -235,11 +235,11 @@ def app_washing_processor():
 # MAIN ROUTING
 # ==========================================
 if st.session_state.current_app == "Main Menu":
-    st.markdown("<h1 style='text-align: center;'>🏭 Internal System Hub</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>🏭 QAD System Hub</h1>", unsafe_allow_html=True)
     st.write("---")
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("📁 File Validator\n(D/K Format Check)"):
+        if st.button("📁 File Validator\n"):
             st.session_state.current_app = "Validator"; st.rerun()
     with c2:
         if st.button("📊 Washing Date\nProcessor"):
