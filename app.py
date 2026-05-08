@@ -54,7 +54,7 @@ try:
             if user_f3 != correct_f3: f_errors.append({"Position": "F3", "Found": user_f3, "Target": correct_f3})
             if user_f5 != correct_f5: f_errors.append({"Position": "F5", "Found": user_f5, "Target": correct_f5})
 
-            # 2. Loop Check All Cells (Missing & Extra)
+            # 2. Check All Cells (Missing & Extra)
             max_r = max(ref_rows, user_rows)
             max_c = max(ref_cols, user_cols)
 
@@ -70,56 +70,51 @@ try:
                         if col_name not in missing_data: missing_data[col_name] = []
                         missing_data[col_name].append(str(r+1))
                     elif is_ref_empty and not is_user_empty:
+                        # ข้ามหัวตารางแถว 12 ไม่ต้องแจ้งว่าเป็น Extra Data
+                        if r+1 == 12: continue
                         if col_name not in extra_data: extra_data[col_name] = []
                         extra_data[col_name].append(str(r+1))
 
-            # 3. ตรวจสอบวันที่ (D, K แถว 12-76) - แก้ไขใหม่ให้ไม่ Alarm มั่ว
-            date_formats = ["%m/%d/%Y %H:%M:%S", "%d/%m/%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S"]
-            
-            for row_idx in range(11, 76): 
+            # 3. ตรวจสอบวันที่ (เริ่มแถว 13 ถึง 76 เท่านั้น)
+            for row_idx in range(12, 76): # Index 12 คือ แถวที่ 13 ใน Excel
                 for col_idx, col_label in zip([3, 10], ['D', 'K']):
                     if row_idx < user_rows:
                         val = df_user.iloc[row_idx, col_idx]
                         
                         if not pd.isna(val) and str(val).strip() != "":
-                            # ถ้าเป็น datetime object จาก Excel อยู่แล้ว (มักจะมีเวลาพ่วงมาด้วย) ให้ข้ามการเช็คไปเลย
+                            raw_val = str(val).strip()
+                            
+                            # ถ้าเป็นหัวตารางหรือตัวหนังสือล้วน ให้ข้ามไป
+                            if any(c.isalpha() for c in raw_val.replace(":", "").replace("/", "").replace("-", "").replace(" ", "")):
+                                continue
+
+                            # ตรวจสอบว่ามี "เวลา" (Space) หรือไม่
+                            # ถ้าเป็น datetime object ของ Excel ปกติจะมีเวลาติดมาด้วยอัตโนมัติ
                             if isinstance(val, datetime):
                                 continue
                             
-                            raw_val = str(val).strip()
-                            if raw_val == "00:00:00": continue
-                            
-                            # ตรวจสอบเบื้องต้น: ต้องมี "เวลา" พ่วงท้าย (เช็คว่ามี Space หรือ Colon ไหม)
-                            if " " not in raw_val and ":" not in raw_val:
-                                date_errors.append({"Column": col_label, "Row": row_idx + 1, "Value": raw_val, "Issue": "Missing Time (HH:MM:SS)"})
-                                continue
-                            
-                            # ลอง Parse หลายๆ Format เผื่อกรณีสลับ วัน/เดือน
-                            valid_format = False
-                            for fmt in date_formats:
-                                try:
-                                    datetime.strptime(raw_val, fmt)
-                                    valid_format = True
-                                    break
-                                except ValueError:
-                                    continue
-                            
-                            if not valid_format:
-                                date_errors.append({"Column": col_label, "Row": row_idx + 1, "Value": raw_val, "Issue": "Invalid Format (Use M/D/YYYY HH:MM:SS)"})
+                            # ถ้าเป็น String ต้องมีช่องว่างแยกวันกับเวลา
+                            if " " not in raw_val and raw_val != "00:00:00":
+                                date_errors.append({
+                                    "Column": col_label, 
+                                    "Row": row_idx + 1, 
+                                    "Value": raw_val, 
+                                    "Issue": "Missing Time (Need HH:MM:SS)"
+                                })
 
-            # --- Display Results ---
+            # --- Display ---
             st.divider()
             if not (f_errors or missing_data or extra_data or date_errors):
-                st.balloons(); st.success("✅ Everything is correct!")
+                st.balloons(); st.success("✅ All checks passed!")
             else:
                 if f_errors:
-                    st.warning("⚠️ Critical Info Mismatch"); st.table(pd.DataFrame(f_errors))
+                    st.warning("⚠️ Part No. / Dwg No. Mismatch"); st.table(pd.DataFrame(f_errors))
                 if missing_data:
                     st.warning("⚠️ Missing Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
                 if extra_data:
-                    st.error("🚫 Extra Data Found (Reference is empty here)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+                    st.error("🚫 Extra Data Found (Reference is empty)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
                 if date_errors:
-                    st.error("⏰ Date/Time Format Error (D, K)"); st.table(pd.DataFrame(date_errors))
+                    st.error("⏰ Date/Time Format Error (Missing Time in Col D)"); st.table(pd.DataFrame(date_errors))
 
 except Exception as e:
     st.error(f"System Error: {e}")
