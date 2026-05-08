@@ -3,18 +3,15 @@ import pandas as pd
 import os
 from openpyxl import load_workbook
 
-# 1. ปรับ Layout กลับมาเป็นแบบเล็กลงอยู่ตรงกลาง (centered)
+# Layout ตรงกลางเหมือนเดิม
 st.set_page_config(page_title="File Validator Pro", layout="centered")
 
-# --- Function สำหรับ Reset ระบบแบบล้างค่า Widget ---
 if 'reset_counter' not in st.session_state:
     st.session_state.reset_counter = 0
 
 def reset_app():
-    # ล้างค่าทั้งหมดใน session_state
     for key in list(st.session_state.keys()):
         del st.session_state[key]
-    # เพิ่ม counter เพื่อเปลี่ยน Key ของ Selectbox บังคับ Reset UI
     st.session_state.reset_counter = st.session_state.get('reset_counter', 0) + 1
     st.rerun()
 
@@ -40,7 +37,6 @@ try:
     available_models = get_available_models()
     model_list = ["-- Please Select --"] + sorted(list(available_models.keys()))
     
-    # ใช้ key ที่เปลี่ยนไปเรื่อยๆ ตามการกด Reset เพื่อให้ Selectbox ยอมกลับไปที่ index 0
     selected_model_name = st.selectbox(
         "1️⃣ Select Model:", 
         model_list, 
@@ -85,21 +81,28 @@ try:
                         if col not in extra_data: extra_data[col] = []
                         extra_data[col].append(str(r+1))
 
-            # --- 3. Strict Custom Format Check (D & K) ---
+            # --- 3. Super Strict Format Check (D & K) ---
             for row_idx in range(13, 77): 
-                # ตรวจ Column D (Washing Date)
-                cell_d = ws.cell(row=row_idx, column=4)
-                if cell_d.value is not None:
-                    fmt_d = str(cell_d.number_format).lower()
-                    if not ('h' in fmt_d and 's' in fmt_d):
-                        d_errors.append({"Row": row_idx, "Format": fmt_d, "Status": "❌ ขาดเวลา"})
-
-                # ตรวจ Column K (Finish Date)
-                cell_k = ws.cell(row=row_idx, column=11)
-                if cell_k.value is not None:
-                    fmt_k = str(cell_k.number_format).lower()
-                    if not ('h' in fmt_k and 's' in fmt_k):
-                        k_errors.append({"Row": row_idx, "Format": fmt_k, "Status": "❌ ขาดเวลา"})
+                for col_idx, (col_label, error_list) in enumerate(zip(['D', 'K'], [d_errors, k_errors]), start=0):
+                    # openpyxl col: D=4, K=11
+                    target_col = 4 if col_label == 'D' else 11
+                    cell = ws.cell(row=row_idx, column=target_col)
+                    
+                    if cell.value is not None:
+                        fmt = str(cell.number_format).lower()
+                        
+                        # ต้องมีองค์ประกอบครบ: y (ปี), d หรือ m (วัน/เดือน), และ h (ชั่วโมง)
+                        # ถ้าเป็น Time อย่างเดียวจะไม่มี y/d
+                        # ถ้าเป็น Date อย่างเดียวจะไม่มี h
+                        has_date = ('y' in fmt) or ('d' in fmt and 'm' in fmt)
+                        has_time = ('h' in fmt)
+                        
+                        if not (has_date and has_time):
+                            error_list.append({
+                                "Row": row_idx, 
+                                "Format": fmt, 
+                                "Status": "❌ รูปแบบผิด (ต้องมีทั้งวันที่และเวลา)"
+                            })
 
             # --- Display Results ---
             if not (f_errors or missing_data or extra_data or d_errors or k_errors):
@@ -118,16 +121,15 @@ try:
                     st.error("🚫 ข้อมูลเกิน (Extra)")
                     st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
 
-                # ส่วนแยก D และ K แบบเล็กลง
                 st.subheader("⏰ ตรวจสอบรูปแบบวันที่และเวลา")
                 if d_errors:
-                    st.error("❌ คอลัมน์ D (Washing Date) ผิดพลาด")
+                    st.error("❌ คอลัมน์ D (Washing Date) รูปแบบไม่ถูกต้อง")
                     st.table(pd.DataFrame(d_errors))
                 else:
                     st.success("✅ คอลัมน์ D ถูกต้อง")
 
                 if k_errors:
-                    st.error("❌ คอลัมน์ K (Finish Date) ผิดพลาด")
+                    st.error("❌ คอลัมน์ K (Finish Date) รูปแบบไม่ถูกต้อง")
                     st.table(pd.DataFrame(k_errors))
                 else:
                     st.success("✅ คอลัมน์ K ถูกต้อง")
