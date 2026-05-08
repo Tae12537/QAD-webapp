@@ -45,7 +45,7 @@ try:
             user_rows, user_cols = df_user.shape
             ref_rows, ref_cols = df_ref.shape
 
-            # 1. Check F3 & F5 (Part No / Dwg No)
+            # 1. Check F3 & F5
             correct_f3 = str(df_ref.iloc[2, 5]).strip()
             correct_f5 = str(df_ref.iloc[4, 5]).strip()
             user_f3 = str(df_user.iloc[2, 5]).strip() if user_rows > 2 else ""
@@ -73,39 +73,51 @@ try:
                         if col_name not in extra_data: extra_data[col_name] = []
                         extra_data[col_name].append(str(r+1))
 
-            # 3. ตรวจสอบวันที่แบบเข้มงวดสูงสุด (D, K แถว 12-76)
-            date_format = "%m/%d/%Y %H:%M:%S"
-            for row_idx in range(11, 76): # แถว 12 คือ Index 11
+            # 3. ตรวจสอบวันที่ (D, K แถว 12-76) - แก้ไขใหม่ให้ไม่ Alarm มั่ว
+            date_formats = ["%m/%d/%Y %H:%M:%S", "%d/%m/%Y %H:%M:%S", "%Y-%m-%d %H:%M:%S"]
+            
+            for row_idx in range(11, 76): 
                 for col_idx, col_label in zip([3, 10], ['D', 'K']):
                     if row_idx < user_rows:
                         val = df_user.iloc[row_idx, col_idx]
+                        
                         if not pd.isna(val) and str(val).strip() != "":
+                            # ถ้าเป็น datetime object จาก Excel อยู่แล้ว (มักจะมีเวลาพ่วงมาด้วย) ให้ข้ามการเช็คไปเลย
+                            if isinstance(val, datetime):
+                                continue
+                            
                             raw_val = str(val).strip()
-                            # กรณีพิเศษ: ถ้าเป็น 00:00:00 ให้ผ่าน
                             if raw_val == "00:00:00": continue
                             
-                            # ตรวจสอบเบื้องต้น: ต้องมี "ช่องว่าง" เพื่อแยกวันกับเวลา
-                            if " " not in raw_val:
+                            # ตรวจสอบเบื้องต้น: ต้องมี "เวลา" พ่วงท้าย (เช็คว่ามี Space หรือ Colon ไหม)
+                            if " " not in raw_val and ":" not in raw_val:
                                 date_errors.append({"Column": col_label, "Row": row_idx + 1, "Value": raw_val, "Issue": "Missing Time (HH:MM:SS)"})
                                 continue
                             
-                            try:
-                                # พยายาม Parse ตาม Format เป๊ะๆ
-                                datetime.strptime(raw_val, date_format)
-                            except ValueError:
-                                date_errors.append({"Column": col_label, "Row": row_idx + 1, "Value": raw_val, "Issue": "Wrong Format (Need M/D/YYYY HH:MM:SS)"})
+                            # ลอง Parse หลายๆ Format เผื่อกรณีสลับ วัน/เดือน
+                            valid_format = False
+                            for fmt in date_formats:
+                                try:
+                                    datetime.strptime(raw_val, fmt)
+                                    valid_format = True
+                                    break
+                                except ValueError:
+                                    continue
+                            
+                            if not valid_format:
+                                date_errors.append({"Column": col_label, "Row": row_idx + 1, "Value": raw_val, "Issue": "Invalid Format (Use M/D/YYYY HH:MM:SS)"})
 
             # --- Display Results ---
             st.divider()
             if not (f_errors or missing_data or extra_data or date_errors):
-                st.balloons(); st.success("✅ Perfect match!")
+                st.balloons(); st.success("✅ Everything is correct!")
             else:
                 if f_errors:
-                    st.warning("⚠️ Part No. / Dwg No. Mismatch"); st.table(pd.DataFrame(f_errors))
+                    st.warning("⚠️ Critical Info Mismatch"); st.table(pd.DataFrame(f_errors))
                 if missing_data:
                     st.warning("⚠️ Missing Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
                 if extra_data:
-                    st.error("🚫 Unexpected Data Found (Extra)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+                    st.error("🚫 Extra Data Found (Reference is empty here)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
                 if date_errors:
                     st.error("⏰ Date/Time Format Error (D, K)"); st.table(pd.DataFrame(date_errors))
 
