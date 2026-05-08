@@ -6,18 +6,62 @@ import os
 from openpyxl import load_workbook
 
 # ==========================================
-# CONFIG & STYLE
+# 🎨 UI CUSTOMIZATION (CSS)
 # ==========================================
 st.set_page_config(page_title="Production Tools Hub", layout="centered")
 
-# ปุ่มเมนูหน้าแรก
 st.markdown("""
     <style>
+    /* พื้นหลังและ Font */
+    .stApp {
+        background-color: #fcfcfc;
+    }
+    
+    /* แต่งปุ่ม Main Menu */
     div.stButton > button:first-child {
-        width: 100%;
-        height: 70px;
-        font-size: 18px;
+        border-radius: 20px;
+        border: 2px solid #ffdeeb;
+        background-color: #ffffff;
+        color: #ff85a2;
+        height: 100px;
+        font-size: 20px;
         font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 2px 4px 8px rgba(0,0,0,0.05);
+    }
+    
+    div.stButton > button:hover {
+        border: 2px solid #ff85a2;
+        background-color: #fff0f5;
+        color: #ff85a2;
+        transform: translateY(-3px);
+    }
+
+    /* แต่ง File Uploader */
+    .stFileUploader {
+        border: 2px dashed #b2e2f2;
+        border-radius: 15px;
+        padding: 10px;
+        background-color: #f0faff;
+    }
+
+    /* แต่งปุ่ม Reset & Process */
+    button[kind="secondary"] {
+        border-radius: 12px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+    }
+    
+    /* หัวข้อภาษาอังกฤษ/ไทย */
+    h1, h2, h3 {
+        color: #4a4a4a;
+        font-family: 'Kanit', sans-serif;
+    }
+    
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background-color: #fff9fb;
+        border-right: 1px solid #ffe4ed;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -26,7 +70,6 @@ if "current_app" not in st.session_state:
     st.session_state.current_app = "Main Menu"
 
 def go_to_menu():
-    # ล้าง Session ยกเว้นตัวที่คุม Navigation
     for key in list(st.session_state.keys()):
         if key not in ["current_app", "reset_counter", "p_uploader_key"]:
             del st.session_state[key]
@@ -34,11 +77,13 @@ def go_to_menu():
     st.rerun()
 
 # ==========================================
-# APP 1: FILE VALIDATOR (โค้ดตัวล่าสุดของคุณ)
+# APP 1: FILE VALIDATOR
 # ==========================================
 def app_file_validator():
-    st.title("📁 File Validator")
-    if st.sidebar.button("⬅️ Exit App (Back to Menu)"):
+    st.markdown("<h2 style='text-align: center; color: #ff85a2;'>✨ File Validator ✨</h2>", unsafe_allow_html=True)
+    
+    st.sidebar.markdown("### 🏠 Navigation")
+    if st.sidebar.button("⬅️ Exit App"):
         go_to_menu()
 
     if 'reset_counter' not in st.session_state:
@@ -50,10 +95,10 @@ def app_file_validator():
         st.session_state.reset_counter = st.session_state.get('reset_counter', 0) + 1
         st.rerun()
 
-    if st.button("🔄 Reset Application"):
+    st.sidebar.write("---")
+    if st.sidebar.button("🔄 Reset This App"):
         reset_app()
 
-    st.divider()
     TARGET_SHEET = "RAMP v1.3"
 
     def get_column_letter(n):
@@ -70,11 +115,14 @@ def app_file_validator():
     try:
         available_models = get_available_models()
         model_list = ["-- Please Select --"] + sorted(list(available_models.keys()))
-        selected_model_name = st.selectbox("1️⃣ Select Model:", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}")
+        
+        st.markdown("#### 1️⃣ เลือก Model อ้างอิง")
+        selected_model_name = st.selectbox("", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}", label_visibility="collapsed")
 
         if selected_model_name != "-- Please Select --":
             ref_filename = available_models[selected_model_name]
-            uploaded_file = st.file_uploader(f"2️⃣ Upload File", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}")
+            st.markdown("#### 2️⃣ อัปโหลดไฟล์ที่ต้องการตรวจ")
+            uploaded_file = st.file_uploader("", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}")
 
             if uploaded_file:
                 wb = load_workbook(uploaded_file, data_only=False)
@@ -108,39 +156,49 @@ def app_file_validator():
                             has_date = ('y' in fmt) or ('d' in fmt and 'm' in fmt)
                             has_time = ('h' in fmt)
                             if not (has_date and has_time):
-                                error_list.append({"Row": row_idx, "Format": fmt, "Status": "❌ รูปแบบผิด (ต้องมีทั้งวันที่และเวลา)"})
+                                error_list.append({"Row": row_idx, "Format": fmt, "Status": "❌ ขาดเวลา"})
 
+                st.markdown("### 📋 ผลการตรวจสอบ")
                 if not (f_errors or missing_data or extra_data or d_errors or k_errors):
-                    st.balloons(); st.success("✅ ข้อมูลและรูปแบบถูกต้องทั้งหมด!")
+                    st.balloons(); st.success("🎉 ยินดีด้วย! ข้อมูลถูกต้องทั้งหมด")
                 else:
-                    if f_errors: st.warning("⚠️ F3/F5 ไม่ตรง"); st.table(pd.DataFrame(f_errors))
-                    if missing_data: st.warning("⚠️ Missing Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
-                    if extra_data: st.error("🚫 Extra Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
-                    st.subheader("⏰ รูปแบบวันที่และเวลา")
-                    if d_errors: st.error("❌ คอลัมน์ D (Washing Date) ผิด"); st.table(pd.DataFrame(d_errors))
-                    if k_errors: st.error("❌ คอลัมน์ K (Finish Date) ผิด"); st.table(pd.DataFrame(k_errors))
+                    if f_errors: st.warning("📍 หัวตาราง (F3/F5) ไม่ตรง"); st.table(pd.DataFrame(f_errors))
+                    if missing_data: st.info("🔍 ข้อมูลหาย (Missing)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
+                    if extra_data: st.error("🚫 ข้อมูลเกิน (Extra)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+                    
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        st.markdown("**⏰ Column D**")
+                        if d_errors: st.dataframe(pd.DataFrame(d_errors))
+                        else: st.write("✅ ปกติ")
+                    with c2:
+                        st.markdown("**⏰ Column K**")
+                        if k_errors: st.dataframe(pd.DataFrame(k_errors))
+                        else: st.write("✅ ปกติ")
     except Exception as e: st.error(f"Error: {e}")
 
 # ==========================================
-# APP 2: WASHING DATE PROCESSOR 
+# APP 2: WASHING DATE PROCESSOR
 # ==========================================
 def app_washing_processor():
-    st.title("📊 Washing Date Processor")
-    if st.sidebar.button("⬅️ Exit App (Back to Menu)"):
+    st.markdown("<h2 style='text-align: center; color: #70a1ff;'>🌸 Washing Date Processor 🌸</h2>", unsafe_allow_html=True)
+    if st.sidebar.button("⬅️ Exit App"):
         go_to_menu()
 
     if "uploader_key" not in st.session_state:
         st.session_state.uploader_key = 0
 
-    if st.button("🔄 Reset"):
+    st.sidebar.write("---")
+    if st.sidebar.button("🔄 Reset"):
         st.session_state.output = None
         st.session_state.summary = None
         st.session_state.file = None
         st.session_state.uploader_key += 1
         st.rerun()
 
-    file1 = st.file_uploader("📂 Upload File 1 (Lot/Serial)", type=["xls", "xlsx", "csv"], key=f"file1_{st.session_state.uploader_key}")
-    file2 = st.file_uploader("📂 Upload File 2 (Runcard / Barcode)", type=["xls", "xlsx", "csv"], key=f"file2_{st.session_state.uploader_key}")
+    st.markdown("#### 📂 อัปโหลดไฟล์ข้อมูล")
+    file1 = st.file_uploader("File 1 (Lot/Serial)", type=["xls", "xlsx", "csv"], key=f"file1_{st.session_state.uploader_key}")
+    file2 = st.file_uploader("File 2 (Runcard / Barcode)", type=["xls", "xlsx", "csv"], key=f"file2_{st.session_state.uploader_key}")
 
     def read_excel(file):
         try: return pd.read_excel(file, engine="openpyxl", header=None)
@@ -149,10 +207,7 @@ def app_washing_processor():
     def read_file1(file):
         df = read_excel(file)
         data = df.iloc[16:, 5]
-        lot_list = []
-        for val in data:
-            if pd.isna(val) or str(val).strip() == "": break
-            lot_list.append(str(val).strip())
+        lot_list = [str(val).strip() for val in data if not pd.isna(val) and str(val).strip() != ""]
         return pd.DataFrame({"Lot": lot_list})
 
     def read_file2(file):
@@ -162,18 +217,14 @@ def app_washing_processor():
             row = df.iloc[i].astype(str).str.lower()
             if row.str.contains("runcard").any() and row.str.contains("barcode").any():
                 header_row = i; break
-        if header_row is None:
-            st.error("❌ หา header ไม่เจอ (Runcard / Barcode)"); return pd.DataFrame()
+        if header_row is None: return pd.DataFrame()
         df.columns = df.iloc[header_row]
         df = df[header_row + 1:]
         df.columns = df.columns.astype(str).str.strip().str.lower()
         lot_cols = [c for c in df.columns if "runcard" in str(c).lower()]
         barcode_cols = [c for c in df.columns if "barcode" in str(c).lower()]
-        if len(lot_cols) == 0 or len(barcode_cols) == 0: return pd.DataFrame()
-        packed_col = None
-        for c in df.columns:
-            if "packed" in str(c).lower() and "date" in str(c).lower(): packed_col = c; break
-        if packed_col is None: return pd.DataFrame()
+        packed_col = next((c for c in df.columns if "packed" in str(c).lower() and "date" in str(c).lower()), None)
+        if not lot_cols or not barcode_cols or not packed_col: return pd.DataFrame()
         df_out = df[[lot_cols[0], barcode_cols[0], packed_col]].copy()
         df_out.columns = ["Lot", "Barcode No", "Packed Date"]
         df_out = df_out.dropna(subset=["Lot"])
@@ -181,68 +232,66 @@ def app_washing_processor():
         df_out["Packed Date"] = pd.to_datetime(df_out["Packed Date"], errors="coerce")
         return df_out
 
-    def extract_ww_day(barcode):
-        try:
-            s = str(barcode)
-            match = re.search('[A-Za-z]', s)
-            if not match: return None, None
-            start = match.start()
-            code = s[start+3:start+6]
-            if len(code) != 3 or not code.isdigit(): return None, None
-            return int(code[:2]), int(code[2])
-        except: return None, None
-
-    if st.button("🚀 Process"):
-        if file1 is None or file2 is None:
-            st.warning("⚠️ กรุณาอัพโหลดไฟล์ให้ครบ")
+    if st.button("🚀 เริ่มการประมวลผล (Process)"):
+        if not file1 or not file2:
+            st.warning("⚠️ อย่าลืมอัปโหลดไฟล์ให้ครบนะจ๊ะ")
         else:
-            df1 = read_file1(file1)
-            df2 = read_file2(file2)
-            merged = pd.merge(df1, df2, on="Lot", how="left").drop_duplicates(subset=["Lot"])
-            merged[['WW', 'Day']] = merged['Barcode No'].apply(lambda x: pd.Series(extract_ww_day(x)))
-            date_db = pd.read_csv("database.txt")
-            date_db["Date"] = pd.to_datetime(date_db["Date"], format="%d-%b-%Y", errors="coerce")
-            
-            def find_best_date(row, db):
-                if pd.isna(row["WW"]) or pd.isna(row["Day"]) or pd.isna(row["Packed Date"]): return None
-                cands = db[(db["WW"] == row["WW"]) & (db["Day"] == row["Day"])].copy()
-                if cands.empty: return None
-                cands["diff"] = (cands["Date"] - row["Packed Date"]).abs()
-                return cands.sort_values("diff").iloc[0]["Date"]
+            with st.spinner('กำลังคำนวณ...'):
+                df1 = read_file1(file1)
+                df2 = read_file2(file2)
+                merged = pd.merge(df1, df2, on="Lot", how="left").drop_duplicates(subset=["Lot"])
+                
+                def extract_ww_day(barcode):
+                    m = re.search('[A-Za-z]', str(barcode))
+                    if not m: return None, None
+                    code = str(barcode)[m.start()+3:m.start()+6]
+                    return (int(code[:2]), int(code[2])) if (len(code)==3 and code.isdigit()) else (None, None)
 
-            merged["Washing Date"] = merged.apply(lambda r: find_best_date(r, date_db), axis=1)
-            output = merged[["Lot", "Barcode No", "WW", "Day", "Washing Date"]].copy()
-            output["Washing Date"] = pd.to_datetime(output["Washing Date"]).dt.strftime("%d-%b-%Y")
-            output = output[output["Lot"].astype(str).str.lower() != "lot/serial"].reset_index(drop=True)
-            summary = output.groupby("Washing Date")["Lot"].count().reset_index().rename(columns={"Lot": "Total Lot"})
-            
-            buffer = io.BytesIO()
-            with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-                output.to_excel(writer, index=False, sheet_name="Result")
-                summary.to_excel(writer, index=False, sheet_name="Summary")
-            
-            st.session_state.output = output
-            st.session_state.summary = summary
-            st.session_state.file = buffer.getvalue()
+                merged[['WW', 'Day']] = merged['Barcode No'].apply(lambda x: pd.Series(extract_ww_day(x)))
+                date_db = pd.read_csv("database.txt")
+                date_db["Date"] = pd.to_datetime(date_db["Date"], format="%d-%b-%Y", errors="coerce")
+                
+                def find_best_date(row, db):
+                    if pd.isna(row["WW"]) or pd.isna(row["Day"]) or pd.isna(row["Packed Date"]): return None
+                    cands = db[(db["WW"] == row["WW"]) & (db["Day"] == row["Day"])].copy()
+                    if cands.empty: return None
+                    cands["diff"] = (cands["Date"] - row["Packed Date"]).abs()
+                    return cands.sort_values("diff").iloc[0]["Date"]
 
-    if "output" in st.session_state and st.session_state.output is not None:
-        st.success("✅ Process สำเร็จ")
-        st.subheader("📋 Result"); st.dataframe(st.session_state.output)
-        st.subheader("📊 Summary"); st.dataframe(st.session_state.summary)
-        st.download_button("📥 Download Excel", st.session_state.file, "washing_date_result.xlsx")
+                merged["Washing Date"] = merged.apply(lambda r: find_best_date(r, date_db), axis=1)
+                output = merged[["Lot", "Barcode No", "WW", "Day", "Washing Date"]].copy()
+                output["Washing Date"] = pd.to_datetime(output["Washing Date"]).dt.strftime("%d-%b-%Y")
+                output = output[output["Lot"].astype(str).str.lower() != "lot/serial"].reset_index(drop=True)
+                summary = output.groupby("Washing Date")["Lot"].count().reset_index().rename(columns={"Lot": "Total Lot"})
+                
+                buf = io.BytesIO()
+                with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+                    output.to_excel(writer, index=False, sheet_name="Result")
+                    summary.to_excel(writer, index=False, sheet_name="Summary")
+                
+                st.session_state.output, st.session_state.summary, st.session_state.file = output, summary, buf.getvalue()
+
+    if st.session_state.get("output") is not None:
+        st.success("🌈 ประมวลผลเรียบร้อยแล้ว!")
+        st.subheader("📋 Result Table"); st.dataframe(st.session_state.output)
+        st.subheader("📊 Summary Table"); st.dataframe(st.session_state.summary)
+        st.download_button("📥 ดาวน์โหลดผลลัพธ์ (Excel)", st.session_state.file, "washing_date_result.xlsx")
 
 # ==========================================
 # MAIN ROUTING
 # ==========================================
 if st.session_state.current_app == "Main Menu":
-    st.markdown("<h1 style='text-align: center;'>🏭 QAD System Hub</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #ff85a2;'>🌈 QAD System Hub 🌈</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #999;'>เลือกเครื่องมือที่คุณต้องการใช้งานได้เลย</p>", unsafe_allow_html=True)
     st.write("---")
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("📁 File Validator\n(ตรวจ Format)"):
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("📁 File Validator\n(ตรวจ Format ไฟล์)"):
             st.session_state.current_app = "Validator"; st.rerun()
-    with c2:
+    with col2:
         if st.button("📊 Washing Date\nProcessor"):
             st.session_state.current_app = "Processor"; st.rerun()
+            
 elif st.session_state.current_app == "Validator": app_file_validator()
 elif st.session_state.current_app == "Processor": app_washing_processor()
