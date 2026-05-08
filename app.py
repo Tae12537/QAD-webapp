@@ -6,62 +6,53 @@ import os
 from openpyxl import load_workbook
 
 # ==========================================
-# 🎨 UI CUSTOMIZATION (CSS)
+# 🎨 UI CUSTOMIZATION (Blue Theme)
 # ==========================================
 st.set_page_config(page_title="Production Tools Hub", layout="centered")
 
 st.markdown("""
     <style>
-    /* พื้นหลังและ Font */
+    /* พื้นหลังสีฟ้าอ่อนมากๆ */
     .stApp {
-        background-color: #fcfcfc;
+        background-color: #f7fbff;
     }
     
-    /* แต่งปุ่ม Main Menu */
+    /* แต่งปุ่ม Main Menu (สีฟ้า) */
     div.stButton > button:first-child {
-        border-radius: 20px;
-        border: 2px solid #ffdeeb;
+        border-radius: 15px;
+        border: 2px solid #b2e2f2;
         background-color: #ffffff;
-        color: #ff85a2;
+        color: #1e90ff;
         height: 100px;
         font-size: 20px;
         font-weight: bold;
         transition: all 0.3s ease;
-        box-shadow: 2px 4px 8px rgba(0,0,0,0.05);
+        box-shadow: 2px 4px 8px rgba(0,0,0,0.03);
     }
     
     div.stButton > button:hover {
-        border: 2px solid #ff85a2;
-        background-color: #fff0f5;
-        color: #ff85a2;
-        transform: translateY(-3px);
+        border: 2px solid #1e90ff;
+        background-color: #e1f5fe;
+        color: #1e90ff;
+        transform: translateY(-2px);
     }
 
-    /* แต่ง File Uploader */
+    /* แต่ง File Uploader ให้เข้ากับสีฟ้า */
     .stFileUploader {
-        border: 2px dashed #b2e2f2;
-        border-radius: 15px;
-        padding: 10px;
-        background-color: #f0faff;
+        border: 2px dashed #90caf9;
+        border-radius: 12px;
+        background-color: #ffffff;
     }
 
-    /* แต่งปุ่ม Reset & Process */
-    button[kind="secondary"] {
-        border-radius: 12px;
-        background-color: #fff;
-        border: 1px solid #ddd;
-    }
-    
-    /* หัวข้อภาษาอังกฤษ/ไทย */
-    h1, h2, h3 {
-        color: #4a4a4a;
-        font-family: 'Kanit', sans-serif;
-    }
-    
-    /* Sidebar */
+    /* Sidebar สีฟ้าอ่อน */
     [data-testid="stSidebar"] {
-        background-color: #fff9fb;
-        border-right: 1px solid #ffe4ed;
+        background-color: #f0f7ff;
+        border-right: 1px solid #e0e0e0;
+    }
+
+    /* หัวข้อสีฟ้าเข้ม */
+    h1, h2, h3 {
+        color: #0d47a1;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -77,12 +68,12 @@ def go_to_menu():
     st.rerun()
 
 # ==========================================
-# APP 1: FILE VALIDATOR
+# APP 1: FILE VALIDATOR 
 # ==========================================
 def app_file_validator():
-    st.markdown("<h2 style='text-align: center; color: #ff85a2;'>✨ File Validator ✨</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;'>📁 File Validator</h2>", unsafe_allow_html=True)
     
-    st.sidebar.markdown("### 🏠 Navigation")
+    st.sidebar.markdown("### Menu")
     if st.sidebar.button("⬅️ Exit App"):
         go_to_menu()
 
@@ -116,13 +107,13 @@ def app_file_validator():
         available_models = get_available_models()
         model_list = ["-- Please Select --"] + sorted(list(available_models.keys()))
         
-        st.markdown("#### 1️⃣ เลือก Model อ้างอิง")
-        selected_model_name = st.selectbox("", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}", label_visibility="collapsed")
+        st.markdown("#### 1️⃣ Select Model")
+        selected_model_name = st.selectbox("Select Model", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}", label_visibility="collapsed")
 
         if selected_model_name != "-- Please Select --":
             ref_filename = available_models[selected_model_name]
-            st.markdown("#### 2️⃣ อัปโหลดไฟล์ที่ต้องการตรวจ")
-            uploaded_file = st.file_uploader("", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}")
+            st.markdown("#### 2️⃣ Upload File")
+            uploaded_file = st.file_uploader("Upload", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}")
 
             if uploaded_file:
                 wb = load_workbook(uploaded_file, data_only=False)
@@ -156,32 +147,32 @@ def app_file_validator():
                             has_date = ('y' in fmt) or ('d' in fmt and 'm' in fmt)
                             has_time = ('h' in fmt)
                             if not (has_date and has_time):
-                                error_list.append({"Row": row_idx, "Format": fmt, "Status": "❌ ขาดเวลา"})
+                                error_list.append({"Row": row_idx, "Format": fmt, "Status": "❌ รูปแบบผิด (ต้องมีทั้งวันที่และเวลา)"})
 
-                st.markdown("### 📋 ผลการตรวจสอบ")
+                st.markdown("### 📋 Result")
                 if not (f_errors or missing_data or extra_data or d_errors or k_errors):
-                    st.balloons(); st.success("🎉 ยินดีด้วย! ข้อมูลถูกต้องทั้งหมด")
+                    st.balloons(); st.success("✅ ข้อมูลและรูปแบบถูกต้องทั้งหมด!")
                 else:
-                    if f_errors: st.warning("📍 หัวตาราง (F3/F5) ไม่ตรง"); st.table(pd.DataFrame(f_errors))
-                    if missing_data: st.info("🔍 ข้อมูลหาย (Missing)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
-                    if extra_data: st.error("🚫 ข้อมูลเกิน (Extra)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+                    if f_errors: st.warning("⚠️ F3/F5 ไม่ตรง"); st.table(pd.DataFrame(f_errors))
+                    if missing_data: st.info("⚠️ Missing Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
+                    if extra_data: st.error("🚫 Extra Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
                     
                     c1, c2 = st.columns(2)
                     with c1:
-                        st.markdown("**⏰ Column D**")
+                        st.markdown("**Column D**")
                         if d_errors: st.dataframe(pd.DataFrame(d_errors))
                         else: st.write("✅ ปกติ")
                     with c2:
-                        st.markdown("**⏰ Column K**")
+                        st.markdown("**Column K**")
                         if k_errors: st.dataframe(pd.DataFrame(k_errors))
                         else: st.write("✅ ปกติ")
     except Exception as e: st.error(f"Error: {e}")
 
 # ==========================================
-# APP 2: WASHING DATE PROCESSOR
+# APP 2: WASHING DATE PROCESSOR 
 # ==========================================
 def app_washing_processor():
-    st.markdown("<h2 style='text-align: center; color: #70a1ff;'>🌸 Washing Date Processor 🌸</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;'>📊 Washing Date Processor</h2>", unsafe_allow_html=True)
     if st.sidebar.button("⬅️ Exit App"):
         go_to_menu()
 
@@ -196,9 +187,9 @@ def app_washing_processor():
         st.session_state.uploader_key += 1
         st.rerun()
 
-    st.markdown("#### 📂 อัปโหลดไฟล์ข้อมูล")
-    file1 = st.file_uploader("File 1 (Lot/Serial)", type=["xls", "xlsx", "csv"], key=f"file1_{st.session_state.uploader_key}")
-    file2 = st.file_uploader("File 2 (Runcard / Barcode)", type=["xls", "xlsx", "csv"], key=f"file2_{st.session_state.uploader_key}")
+    st.markdown("#### 📂 Upload Files")
+    file1 = st.file_uploader("Upload File 1 (Lot/Serial)", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
+    file2 = st.file_uploader("Upload File 2 (Runcard / Barcode)", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
 
     def read_excel(file):
         try: return pd.read_excel(file, engine="openpyxl", header=None)
@@ -232,11 +223,11 @@ def app_washing_processor():
         df_out["Packed Date"] = pd.to_datetime(df_out["Packed Date"], errors="coerce")
         return df_out
 
-    if st.button("🚀 เริ่มการประมวลผล (Process)"):
+    if st.button("🚀 Process"):
         if not file1 or not file2:
-            st.warning("⚠️ อย่าลืมอัปโหลดไฟล์ให้ครบนะจ๊ะ")
+            st.warning("⚠️ กรุณาอัปโหลดไฟล์ให้ครบ")
         else:
-            with st.spinner('กำลังคำนวณ...'):
+            with st.spinner('Processing...'):
                 df1 = read_file1(file1)
                 df2 = read_file2(file2)
                 merged = pd.merge(df1, df2, on="Lot", how="left").drop_duplicates(subset=["Lot"])
@@ -272,17 +263,17 @@ def app_washing_processor():
                 st.session_state.output, st.session_state.summary, st.session_state.file = output, summary, buf.getvalue()
 
     if st.session_state.get("output") is not None:
-        st.success("🌈 ประมวลผลเรียบร้อยแล้ว!")
-        st.subheader("📋 Result Table"); st.dataframe(st.session_state.output)
-        st.subheader("📊 Summary Table"); st.dataframe(st.session_state.summary)
-        st.download_button("📥 ดาวน์โหลดผลลัพธ์ (Excel)", st.session_state.file, "washing_date_result.xlsx")
+        st.success("✅ Success!")
+        st.subheader("📋 Result"); st.dataframe(st.session_state.output)
+        st.subheader("📊 Summary"); st.dataframe(st.session_state.summary)
+        st.download_button("📥 Download Excel", st.session_state.file, "washing_date_result.xlsx")
 
 # ==========================================
 # MAIN ROUTING
 # ==========================================
 if st.session_state.current_app == "Main Menu":
-    st.markdown("<h1 style='text-align: center; color: #ff85a2;'>🌈 QAD System Hub 🌈</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #999;'>เลือกเครื่องมือที่คุณต้องการใช้งานได้เลย</p>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>🏭 QAD System Hub</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center;'>เลือกเครื่องมือที่ต้องการ</p>", unsafe_allow_html=True)
     st.write("---")
     
     col1, col2 = st.columns(2)
