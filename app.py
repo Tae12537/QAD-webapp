@@ -34,79 +34,82 @@ try:
     if selected_model_name != "-- Please Select --":
         ref_filename = available_models[selected_model_name]
         
-        # อ่านไฟล์ Reference และ User ให้เป็น String ทั้งหมดเพื่อความเสถียร
-        df_ref = pd.read_excel(ref_filename, sheet_name=TARGET_SHEET, header=None, dtype=str, engine='openpyxl').fillna("")
+        # 1. อ่านไฟล์แบบปกติ (ไม่ระบุ dtype=str เพื่อให้ช่องอื่นไม่พัง)
+        df_ref = pd.read_excel(ref_filename, sheet_name=TARGET_SHEET, header=None, engine='openpyxl')
         
         uploaded_file = st.file_uploader(f"2️⃣ Upload File", type=["xlsx", "xlsm"])
 
         if uploaded_file:
-            df_user = pd.read_excel(uploaded_file, sheet_name=TARGET_SHEET, header=None, dtype=str, engine='openpyxl').fillna("")
+            df_user = pd.read_excel(uploaded_file, sheet_name=TARGET_SHEET, header=None, engine='openpyxl')
             
             f_errors, missing_data, extra_data, date_errors = [], {}, {}, []
             
-            # --- ส่วนที่ 1: Check F3 / F5 (หัวตารางต้องตรง) ---
+            # --- ส่วนที่ 1: Check F3 / F5 ---
             for r, c, label in [(2, 5, "F3"), (4, 5, "F5")]:
-                ref_v = df_ref.iloc[r, c].strip()
-                user_v = df_user.iloc[r, c].strip()
+                ref_v = str(df_ref.iloc[r, c]).strip()
+                user_v = str(df_user.iloc[r, c]).strip()
                 if user_v != ref_v:
                     f_errors.append({"Position": label, "Found": user_v, "Target": ref_v})
 
-            # --- ส่วนที่ 2: Check Missing/Extra (เน้นแค่ "ความว่าง") ---
-            # วนลูปเช็คถึงแถว 76
+            # --- ส่วนที่ 2: Check ข้อมูลทั่วไป (A, B, C, E, ...) ---
             for r in range(76):
                 for c in range(df_ref.shape[1]):
-                    ref_v = df_ref.iloc[r, c].strip() if r < df_ref.shape[0] else ""
-                    user_v = df_user.iloc[r, c].strip() if r < df_user.shape[0] else ""
+                    # ข้ามคอลัมน์ D(3) และ K(10) ในช่วงข้อมูล
+                    if r >= 12 and c in [3, 10]: continue
                     
-                    # ข้ามการเช็ค Missing/Extra สำหรับคอลัมน์ D(3) และ K(10) ในแถว 13-76 
-                    # เพราะเราจะไปเช็คละเอียดที่ส่วนที่ 3 แทน
-                    if r >= 12 and c in [3, 10]:
-                        continue
-
-                    # Missing: ต้นฉบับมี แต่ไฟล์ที่อัพโหลดไม่มี
-                    if ref_v != "" and user_v == "":
+                    ref_v = str(df_ref.iloc[r, c]).strip() if r < df_ref.shape[0] else "nan"
+                    user_v = str(df_user.iloc[r, c]).strip() if r < df_user.shape[0] else "nan"
+                    
+                    if ref_v != "nan" and user_v == "nan":
                         col = get_column_letter(c)
                         if col not in missing_data: missing_data[col] = []
                         missing_data[col].append(str(r+1))
-                    
-                    # Extra: ต้นฉบับไม่มี แต่ไฟล์ที่อัพโหลดดันมี
-                    elif ref_v == "" and user_v != "":
-                        if r+1 == 12: continue # ข้ามหัวตารางแถว 12
+                    elif ref_v == "nan" and user_v != "nan":
+                        if r+1 == 12: continue
                         col = get_column_letter(c)
                         if col not in extra_data: extra_data[col] = []
                         extra_data[col].append(str(r+1))
 
-            # --- ส่วนที่ 3: Targeted Date Check (D13-76 และ K13-76) ---
-            # ใช้ Logic การนับ Digit ตามที่คุณต้องการ
+            # --- ส่วนที่ 3: จัดการ D และ K (นับ Digit แบบ Force Format) ---
             for row_idx in range(12, 76): 
                 for col_idx, col_label in zip([3, 10], ['D', 'K']):
                     if row_idx < df_user.shape[0]:
-                        val = df_user.iloc[row_idx, col_idx].strip()
+                        raw_val = df_user.iloc[row_idx, col_idx]
                         
-                        # เช็คเฉพาะถ้ามีข้อมูล (ถ้าว่าง ส่วน Missing Data จะจัดการเอง)
-                        if val != "":
-                            # ถ้าน้อยกว่า 15 หลัก (เช่น มีแค่ 4/5/2026) ให้ Alarm
-                            if len(val) < 15:
+                        if pd.notna(raw_val) and str(raw_val).strip() != "":
+                            # บังคับแปลงเป็น String Format "Y-m-d H:M:S" เพื่อให้นับหลักได้คงที่
+                            try:
+                                # ถ้าเป็นวันที่ (DateTime) มันจะกลายเป็น "2026-05-04 00:00:00" (19 หลัก)
+                                formatted_val = pd.to_datetime(raw_val).strftime('%Y-%m-%d %H:%M:%S')
+                            except:
+                                # ถ้าไม่ใช่เครื่องหมายวันที่ ก็ให้อ่านเป็น string ตรงๆ
+                                formatted_val = str(raw_val).strip()
+
+                            # เช็ค Digit: ถ้าไม่มีข้อมูลเวลา (มักจะมาในรูป 00:00:00) 
+                            # หรือถ้าเรานับจาก String ที่ "ควรจะเป็น" ใน Excel
+                            # ผมเปลี่ยนมาเช็คว่า "ถ้าคุณใส่แค่ 4/5/2026" ใน Excel จริงๆ
+                            # มันจะไม่มี Space ในตัวแปรดั้งเดิม
+                            
+                            original_str = str(raw_val).strip()
+                            
+                            # ถ้าไม่มีช่องว่าง (ไม่มีเวลาพ่วง) -> Alarm
+                            # (เช่น '4/5/2026' ไม่มีช่องว่าง แต่ '11/4/2026 0:00:00' มีช่องว่าง)
+                            if " " not in original_str:
                                 date_errors.append({
                                     "Column": col_label,
                                     "Row": row_idx + 1,
-                                    "Value": val,
-                                    "Issue": "ข้อมูลช่องนั้นผิดพลาด (กรุณาใส่เวลาให้ครบ)"
+                                    "Value": original_str,
+                                    "Issue": "ข้อมูลช่องนั้นผิดพลาด (ใส่เวลาไม่ครบ)"
                                 })
 
-            # --- แสดงผลลัพธ์ ---
+            # --- แสดงผล ---
             if not (f_errors or missing_data or extra_data or date_errors):
-                st.balloons()
-                st.success("✅ ข้อมูลถูกต้องทั้งหมด!")
+                st.balloons(); st.success("✅ ข้อมูลถูกต้องทั้งหมด!")
             else:
-                if f_errors: 
-                    st.warning("⚠️ ข้อมูลส่วนหัวไม่ตรง (F3/F5)"); st.table(pd.DataFrame(f_errors))
-                if missing_data: 
-                    st.warning("⚠️ ข้อมูลหายไป"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
-                if extra_data: 
-                    st.error("🚫 มีข้อมูลเกินมาจากต้นฉบับ"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
-                if date_errors: 
-                    st.error("⏰ พบข้อผิดพลาดในคอลัมน์ D หรือ K"); st.table(pd.DataFrame(date_errors))
+                if f_errors: st.warning("⚠️ Mismatch F3/F5"); st.table(pd.DataFrame(f_errors))
+                if missing_data: st.warning("⚠️ Data Missing"); st.table([{"Col": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
+                if extra_data: st.error("🚫 Extra Data"); st.table([{"Col": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+                if date_errors: st.error("⏰ พบข้อผิดพลาดในคอลัมน์ D หรือ K"); st.table(pd.DataFrame(date_errors))
 
 except Exception as e:
     st.error(f"Error: {e}")
