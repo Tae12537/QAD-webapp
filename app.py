@@ -6,53 +6,61 @@ import os
 from openpyxl import load_workbook
 
 # ==========================================
-# 🎨 UI CUSTOMIZATION (Blue Theme)
+# 🎨 UI CUSTOMIZATION (Electric Blue Theme)
 # ==========================================
 st.set_page_config(page_title="Production Tools Hub", layout="centered")
 
 st.markdown("""
     <style>
-    /* พื้นหลังสีฟ้าอ่อนมากๆ */
+    /* พื้นหลังสีฟ้าอ่อนแบบเห็นชัด */
     .stApp {
-        background-color: #f7fbff;
+        background-color: #eef7ff;
     }
     
-    /* แต่งปุ่ม Main Menu (สีฟ้า) */
+    /* แต่งปุ่ม Main Menu ให้เป็นสีฟ้าตะโกน */
     div.stButton > button:first-child {
         border-radius: 15px;
-        border: 2px solid #b2e2f2;
+        border: 2px solid #007bff;
         background-color: #ffffff;
-        color: #1e90ff;
+        color: #007bff;
         height: 100px;
-        font-size: 20px;
+        font-size: 22px;
         font-weight: bold;
         transition: all 0.3s ease;
-        box-shadow: 2px 4px 8px rgba(0,0,0,0.03);
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.1);
     }
     
+    /* ตอนเอาเมาส์ชี้ (Hover) */
     div.stButton > button:hover {
-        border: 2px solid #1e90ff;
-        background-color: #e1f5fe;
-        color: #1e90ff;
-        transform: translateY(-2px);
+        border: 2px solid #0056b3;
+        background-color: #007bff;
+        color: #ffffff;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.2);
     }
 
-    /* แต่ง File Uploader ให้เข้ากับสีฟ้า */
+    /* แต่งกรอบ File Uploader ให้ฟ้าชัดเจน */
     .stFileUploader {
-        border: 2px dashed #90caf9;
+        border: 2px dashed #007bff;
         border-radius: 12px;
         background-color: #ffffff;
     }
 
-    /* Sidebar สีฟ้าอ่อน */
+    /* Sidebar สีฟ้าสว่าง */
     [data-testid="stSidebar"] {
-        background-color: #f0f7ff;
-        border-right: 1px solid #e0e0e0;
+        background-color: #d1e9ff;
+        border-right: 2px solid #007bff;
     }
 
-    /* หัวข้อสีฟ้าเข้ม */
+    /* หัวข้อสีฟ้าเข้มแบบ Deep Blue */
     h1, h2, h3 {
-        color: #0d47a1;
+        color: #004085;
+    }
+
+    /* ปรับแต่งตารางให้ขอบมีสีฟ้า */
+    .stDataFrame {
+        border: 1px solid #cce5ff;
+        border-radius: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -68,7 +76,7 @@ def go_to_menu():
     st.rerun()
 
 # ==========================================
-# APP 1: FILE VALIDATOR 
+# APP 1: FILE VALIDATOR
 # ==========================================
 def app_file_validator():
     st.markdown("<h2 style='text-align: center;'>📁 File Validator</h2>", unsafe_allow_html=True)
@@ -169,7 +177,7 @@ def app_file_validator():
     except Exception as e: st.error(f"Error: {e}")
 
 # ==========================================
-# APP 2: WASHING DATE PROCESSOR 
+# APP 2: WASHING DATE PROCESSOR
 # ==========================================
 def app_washing_processor():
     st.markdown("<h2 style='text-align: center;'>📊 Washing Date Processor</h2>", unsafe_allow_html=True)
@@ -273,7 +281,7 @@ def app_washing_processor():
 # ==========================================
 if st.session_state.current_app == "Main Menu":
     st.markdown("<h1 style='text-align: center;'>🏭 QAD System Hub</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center;'>เลือกเครื่องมือที่ต้องการ</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center;'>กรุณาเลือกเครื่องมือที่ต้องการ</p>", unsafe_allow_html=True)
     st.write("---")
     
     col1, col2 = st.columns(2)
