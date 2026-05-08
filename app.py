@@ -122,7 +122,7 @@ def app_file_validator():
     except Exception as e: st.error(f"Error: {e}")
 
 # ==========================================
-# APP 2: WASHING DATE PROCESSOR (โค้ดตัวที่คุณส่งมาเป๊ะๆ)
+# APP 2: WASHING DATE PROCESSOR 
 # ==========================================
 def app_washing_processor():
     st.title("📊 Washing Date Processor")
