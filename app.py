@@ -34,15 +34,15 @@ try:
 
     if selected_model_name != "-- Please Select --":
         ref_filename = available_models[selected_model_name]
-        
         uploaded_file = st.file_uploader(f"2️⃣ Upload File", type=["xlsx", "xlsm"])
 
         if uploaded_file:
-            # --- เทคนิคพิเศษ: ใช้ openpyxl อ่านค่าดิบ (Raw Value) เพื่อดักจำนวน Digit ---
-            wb = load_workbook(uploaded_file, data_only=False) # data_only=False เพื่อดูว่า user พิมพ์อะไร
+            # --- เทคนิคแคะข้อความดิบ (Raw Values Only) ---
+            # ใช้ openpyxl เพื่อดึงสิ่งที่ User พิมพ์จริงๆ ออกมา
+            wb = load_workbook(uploaded_file, data_only=False) 
             ws = wb[TARGET_SHEET]
             
-            # แปลงเป็น DataFrame สำหรับช่องอื่นๆ
+            # อ่านไฟล์ Reference และ User สำหรับส่วนอื่นๆ
             df_ref = pd.read_excel(ref_filename, sheet_name=TARGET_SHEET, header=None).fillna("")
             df_user = pd.read_excel(uploaded_file, sheet_name=TARGET_SHEET, header=None).fillna("")
             
@@ -55,7 +55,7 @@ try:
                 if user_v != ref_v:
                     f_errors.append({"Position": label, "Found": user_v, "Target": ref_v})
 
-            # 2. Check ข้อมูลทั่วไป (ยกเว้น D, K)
+            # 2. Check ข้อมูลทั่วไป (ข้าม D, K)
             for r in range(76):
                 for c in range(df_ref.shape[1]):
                     if r >= 12 and c in [3, 10]: continue
@@ -71,33 +71,40 @@ try:
                         if col not in extra_data: extra_data[col] = []
                         extra_data[col].append(str(r+1))
 
-            # 3. Check Date Digit Count (D13-76 และ K13-76) แบบแคะค่าดิบ
-            for row_idx in range(13, 77): # แถว Excel 13-76
-                for col_idx, col_label in zip([4, 11], ['D', 'K']): # openpyxl นับเริ่มที่ 1 (D=4, K=11)
-                    raw_cell_value = ws.cell(row=row_idx, column=col_idx).value
+            # 3. Check คอลัมน์ D และ K โดย "นับตัวอักษร" เท่านั้น
+            # เกณฑ์: วันที่+เวลา (xx/xx/xx xx:xx:xx) ควรมีประมาณ 17-19 ตัวอักษร
+            # ถ้าพิมพ์แค่ 4/5/2026 จะมีแค่ประมาณ 8-10 ตัวอักษร
+            for row_idx in range(13, 77): # แถว 13 ถึง 76
+                for col_idx, col_label in zip([4, 11], ['D', 'K']): # D=4, K=11 ใน openpyxl
+                    cell = ws.cell(row=row_idx, column=col_idx)
                     
-                    if raw_cell_value is not None:
-                        # แปลงเป็น string เพื่อให้นับหลักได้
-                        val_str = str(raw_cell_value).strip()
+                    # ดึงค่าที่เป็น Internal Value ออกมา (ไม่เอา Format)
+                    raw_val = cell.value
+                    
+                    if raw_val is not None:
+                        # บังคับให้เป็น String แล้วลบช่องว่างหัวท้าย
+                        val_str = str(raw_val).strip()
                         
-                        # ถ้าเป็นคอลัมน์ D แล้วยาวไม่ถึง 15 หลัก (เช่นพิมพ์แค่ 4/5/2026) -> Alarm
-                        # หรือถ้าเป็นคอลัมน์ K แล้วพิมพ์สั้น -> Alarm
+                        # กรองคำว่า 00:00:00 ออกถ้ามันแอบติดมาจากการแปลงประเภทข้อมูลของ Library
+                        # แต่ถ้าคุณพิมพ์มาเอง มันจะมีช่องว่างคั่น เช่น "2026-05-04 10:30:00"
+                        
+                        # ถ้าความยาวน้อยกว่า 15 (แปลว่าไม่มีเวลาพ่วงมาด้วย) -> Alarm
                         if len(val_str) < 15:
                             date_errors.append({
                                 "Column": col_label,
                                 "Row": row_idx,
                                 "Value": val_str,
-                                "Issue": "ข้อมูลช่องนั้นผิดพลาด (กรุณาใส่เวลาให้ครบ)"
+                                "Status": "ข้อมูลช่องนั้นผิดพลาด (กรุณาใส่เวลาให้ครบ)"
                             })
 
-            # --- Display ---
+            # --- สรุปผล ---
             if not (f_errors or missing_data or extra_data or date_errors):
                 st.balloons(); st.success("✅ ข้อมูลถูกต้องทั้งหมด!")
             else:
-                if f_errors: st.warning("⚠️ Mismatch F3/F5"); st.table(pd.DataFrame(f_errors))
-                if missing_data: st.warning("⚠️ Missing Data"); st.table([{"Col": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
-                if extra_data: st.error("🚫 Extra Data"); st.table([{"Col": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
-                if date_errors: st.error("⏰ พบข้อผิดพลาดในคอลัมน์ D หรือ K (ใส่เวลาไม่ครบ)"); st.table(pd.DataFrame(date_errors))
+                if f_errors: st.warning("⚠️ หัวตารางไม่ตรง"); st.table(pd.DataFrame(f_errors))
+                if missing_data: st.warning("⚠️ ข้อมูลขาดหาย"); st.table([{"Col": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
+                if extra_data: st.error("🚫 มีข้อมูลเกิน"); st.table([{"Col": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+                if date_errors: st.error("⏰ รูปแบบวันที่/เวลาผิดพลาด (D, K)"); st.table(pd.DataFrame(date_errors))
 
 except Exception as e:
-    st.error(f"Error: {e}")
+    st.error(f"เกิดข้อผิดพลาด: {e}")
