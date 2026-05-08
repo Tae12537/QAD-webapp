@@ -239,7 +239,7 @@ if st.session_state.current_app == "Main Menu":
     st.write("---")
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("📁 File Validator\n"):
+        if st.button("📁 File Validator\n(ตรวจ Format)"):
             st.session_state.current_app = "Validator"; st.rerun()
     with c2:
         if st.button("📊 Washing Date\nProcessor"):
