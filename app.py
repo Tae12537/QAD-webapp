@@ -117,7 +117,7 @@ def go_to_menu():
 # ==========================================
 def app_file_validator():
     st.markdown("<h1 style='text-align: center; color: #1e3a8a;'>📁 File Validator</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b;'>ตรวจสอบโครงสร้างและความถูกต้องของไฟล์ RAMP</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b;'>ตรวจสอบโครงสร้างและความถูกต้องของไฟล์</p>", unsafe_allow_html=True)
     
     with st.sidebar:
         st.markdown("### 🧭 Control Panel")
