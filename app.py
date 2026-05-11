@@ -28,27 +28,22 @@ st.markdown("""
         border-right: 1px solid rgba(0,0,0,0.05);
     }
 
-    div.block-container {
-        padding-top: 2rem;
-    }
-
-    /* ปุ่มเมนูหลักสไตล์ Premium - บังคับให้อยู่กลาง */
+    /* ปุ่มเมนูหลักสไตล์ Premium - แก้ไขให้ Center 100% */
     div.stButton > button:first-child {
         background: #ffffff;
         color: #0f172a;
         border: 1px solid #e2e8f0;
         border-radius: 24px;
-        height: 120px;
-        width: 100%;
-        font-size: 24px;
+        height: 140px;
+        width: 320px; /* กำหนดความกว้างตายตัวเพื่อให้ดูสมดุล */
+        font-size: 20px;
         font-weight: 700;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
         transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         text-transform: uppercase;
         letter-spacing: 1px;
+        margin: 0 auto; /* สั่งกึ่งกลางใน container */
         display: block;
-        margin-left: auto;
-        margin-right: auto;
     }
 
     div.stButton > button:hover {
@@ -59,7 +54,15 @@ st.markdown("""
         box-shadow: 0 20px 25px -5px rgba(30, 58, 138, 0.25);
     }
 
-    /* ชื่อแอปหลัก */
+    /* บังคับให้ Column จัดวางปุ่มไว้ตรงกลาง */
+    [data-testid="column"] {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
     .main-title {
         font-size: 64px;
         font-weight: 700;
@@ -72,6 +75,7 @@ st.markdown("""
 
     .center-text {
         text-align: center;
+        width: 100%;
     }
 
     h1, h2, h3 {
@@ -79,32 +83,14 @@ st.markdown("""
         color: #1e293b !important;
         letter-spacing: -0.5px;
         text-align: center !important;
+        width: 100%;
     }
 
-    /* ปรับแต่ง Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 24px;
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        white-space: pre;
-        background-color: transparent;
-        border-radius: 8px;
-        color: #64748b;
-        font-weight: 500;
-    }
-
-    .stTabs [aria-selected="true"] {
-        color: #1e3a8a !important;
-        border-bottom-color: #1e3a8a !important;
-    }
-
-    [data-testid="stDataFrame"] {
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
+    /* ปรับแต่งส่วนอื่นๆ */
+    .stTabs [data-baseweb="tab-list"] { gap: 24px; }
+    .stTabs [data-baseweb="tab"] { height: 50px; color: #64748b; font-weight: 500; }
+    .stTabs [aria-selected="true"] { color: #1e3a8a !important; }
+    [data-testid="stDataFrame"] { border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -258,9 +244,9 @@ def app_washing_processor():
 
     col_f1, col_f2 = st.columns(2)
     with col_f1:
-        file1 = st.file_uploader("📂 Lot List File (ไฟล์จาก Part Vintage)", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
+        file1 = st.file_uploader("📂 Lot List File", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
     with col_f2:
-        file2 = st.file_uploader("📂 Barcode Data File (File download จากเว็บ PDD)", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
+        file2 = st.file_uploader("📂 Barcode Data File", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
 
     def read_excel(file):
         try: return pd.read_excel(file, engine="openpyxl", header=None)
@@ -314,31 +300,28 @@ def app_washing_processor():
         st.download_button("📥 DOWNLOAD RESULT (.XLSX)", st.session_state.file, f"Result_{datetime.datetime.now().strftime('%H%M')}.xlsx", use_container_width=True)
 
 # ==========================================
-# MAIN ROUTING - UPDATED FOR PERFECT CENTERING
+# MAIN ROUTING - FINAL CENTERED FIX
 # ==========================================
 if st.session_state.current_app == "Main Menu":
-    st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     st.markdown("<p class='main-title'>QAD System Hub</p>", unsafe_allow_html=True)
     st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px; font-weight: 300;'>QAD Support Application</p>", unsafe_allow_html=True)
-    st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 80px;'></div>", unsafe_allow_html=True)
     
-    # ใช้ 3 คอลัมน์โดยให้คอลัมน์กลางกว้างที่สุดเพื่อดึงเข้าหาศูนย์กลาง
-    _, col_main, _ = st.columns([0.15, 0.7, 0.15])
+    # แบ่ง 2 คอลัมน์ที่เท่ากันเป๊ะๆ และตัว CSS ด้านบนจะจัดการให้ Content ภายในกึ่งกลางเอง
+    c1, c2 = st.columns(2)
     
-    with col_main:
-        c1, c2 = st.columns(2, gap="large")
-        
-        with c1:
-            st.markdown("### ตรวจสอบ format ไฟล์ก่อนส่ง")
-            st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-            if st.button("📁 File Validator"):
-                st.session_state.current_app = "Validator"; st.rerun()
+    with c1:
+        st.markdown("### ตรวจสอบ format ไฟล์ก่อนส่ง")
+        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+        if st.button("📁 File Validator"):
+            st.session_state.current_app = "Validator"; st.rerun()
 
-        with c2:
-            st.markdown("### ตรวจสอบวันล้าง")
-            st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-            if st.button("📊 Washing Date Processor"):
-                st.session_state.current_app = "Processor"; st.rerun()
+    with c2:
+        st.markdown("### ตรวจสอบวันล้าง")
+        st.markdown("<div style='height: 15px;'></div>", unsafe_allow_html=True)
+        if st.button("📊 Washing Date Processor"):
+            st.session_state.current_app = "Processor"; st.rerun()
 
     st.markdown("<div style='height: 120px;'></div>", unsafe_allow_html=True)
     st.markdown("<p class='center-text' style='color: #cbd5e1; font-size: 12px;'>© 2026 QAD Engineering | System Excellence v2.5</p>", unsafe_allow_html=True)
