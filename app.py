@@ -3,6 +3,7 @@ import pandas as pd
 import io
 import re
 import os
+import datetime
 from openpyxl import load_workbook
 
 # ==========================================
@@ -54,7 +55,7 @@ def go_to_menu():
     st.rerun()
 
 # ==========================================
-# APP 1: FILE VALIDATOR (Updated Logic)
+# APP 1: FILE VALIDATOR (Smart DateTime Check)
 # ==========================================
 def app_file_validator():
     st.markdown("<h2 style='text-align: center;'>📁 File Validator</h2>", unsafe_allow_html=True)
@@ -120,32 +121,40 @@ def app_file_validator():
                         elif ref_v == "" and (user_v != "" and user_v != "nan") and r+1 != 12:
                             extra_data.setdefault(get_column_letter(c), []).append(str(r+1))
 
-                # ตรวจ Column D และ K (Logic แก้ไขใหม่)
+                # ตรวจ Column D และ K (Smart Logic)
                 for row_idx in range(13, 77): 
                     for col_idx, (col_label, error_list) in enumerate(zip(['D', 'K'], [d_errors, k_errors])):
                         target_col = 4 if col_label == 'D' else 11
                         cell = ws.cell(row=row_idx, column=target_col)
                         
                         if cell.value is not None:
-                            # 1. เช็ค Format เบื้องต้น
+                            val = cell.value
                             fmt = str(cell.number_format).lower()
+                            
+                            # 1. เช็ค Format Cell (ต้องมีวันที่และเวลา)
                             has_format = (('y' in fmt or ('d' in fmt and 'm' in fmt)) and 'h' in fmt)
                             
-                            # 2. เช็ค "ไส้ใน" ข้อมูลว่ามีเวลาติดมาจริงหรือไม่
-                            val = cell.value
-                            has_time_data = False
-                            try:
-                                dt_val = pd.to_datetime(val)
-                                # ถ้า hour, minute, second เป็น 0 หมด แสดงว่าไม่มีเวลาติดมา
-                                if dt_val.hour == 0 and dt_val.minute == 0 and dt_val.second == 0:
-                                    has_time_data = False
-                                else:
-                                    has_time_data = True
-                            except:
-                                has_time_data = False
+                            # 2. เช็คข้อมูลไส้ใน (Data Type)
+                            is_valid_data = False
+                            
+                            # ถ้าเป็น Object วันที่จาก Excel โดยตรง (Double Click แล้ว หรือ Format สมบูรณ์)
+                            if isinstance(val, (datetime.datetime, datetime.date)):
+                                is_valid_data = True
+                            else:
+                                # ถ้าเป็น String (ก๊อปวาง) ต้องลองแปลงดูว่ามีเวลาติดมาไหม
+                                try:
+                                    dt_temp = pd.to_datetime(val)
+                                    # ถ้าแปลงแล้ว hour, min, sec เป็น 0 หมด (00:00:00) และไม่ใช่ Datetime Object
+                                    # แสดงว่าอาจจะเป็นแค่ข้อความวันที่ที่ไม่มีเวลาติดมา
+                                    if dt_temp.hour == 0 and dt_temp.minute == 0 and dt_temp.second == 0:
+                                        is_valid_data = False
+                                    else:
+                                        is_valid_data = True
+                                except:
+                                    is_valid_data = False
 
-                            if not has_format or not has_time_data:
-                                reason = "❌ รูปแบบผิด" if not has_format else "❌ ไม่มีข้อมูลเวลา (Time is 00:00:00)"
+                            if not has_format or not is_valid_data:
+                                reason = "❌ Format ผิด" if not has_format else "❌ ข้อมูลเป็นข้อความ (กรุณา Double Click หรือใช้ Text to Columns)"
                                 error_list.append({"Row": row_idx, "Value": str(val), "Status": reason})
 
                 st.markdown("### 📋 Result")
@@ -192,7 +201,7 @@ def app_washing_processor():
         if not file1 or not file2:
             st.warning("⚠️ กรุณาอัปโหลดไฟล์ให้ครบ")
         else:
-            # Logic การอ่านไฟล์และ Process (เหมือนเดิม)
+            # Processing Logic (เหมือนเดิม)
             df1_raw = read_excel(file1)
             df1 = pd.DataFrame({"Lot": [str(v).strip() for v in df1_raw.iloc[16:, 5] if not pd.isna(v) and str(v).strip() != ""]})
             
@@ -253,7 +262,7 @@ def app_washing_processor():
 if st.session_state.current_app == "Main Menu":
     st.markdown("<h1 style='text-align: center;'>🏭 QAD System Hub</h1>", unsafe_allow_html=True)
     st.write("---")
-    c1, c2 = st.columns(2)
+    c1, col_gap, c2 = st.columns([1, 0.1, 1])
     with c1:
         if st.button("📁 File Validator\n(ตรวจ Format)"):
             st.session_state.current_app = "Validator"; st.rerun()
