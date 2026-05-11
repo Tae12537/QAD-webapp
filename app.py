@@ -339,7 +339,7 @@ if st.session_state.current_app == "Main Menu":
                 st.session_state.current_app = "Processor"; st.rerun()
 
     st.markdown("<div style='height: 120px;'></div>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #94a3b8; font-size: 14px; font-family: Itim;'>© 2026 QE Engineering | Excellence in Systems v2.5 ✨</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #94a3b8; font-size: 14px; font-family: Itim;'>© 2026 Quality Engineering | Systems v2 ✨</p>", unsafe_allow_html=True)
 
 elif st.session_state.current_app == "Validator": app_file_validator()
 elif st.session_state.current_app == "Processor": app_washing_processor()
