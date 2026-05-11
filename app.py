@@ -159,7 +159,7 @@ def app_file_validator():
 
             if uploaded_file:
                 st.write("---")
-                with st.status("🔍 Auditing File Integrity...", expanded=True) as status:
+                with st.status("🔍 Checking File Integrity...", expanded=True) as status:
                     wb = load_workbook(uploaded_file, data_only=False)
                     ws = wb[TARGET_SHEET]
                     df_ref = pd.read_excel(available_models[selected_model_name], sheet_name=TARGET_SHEET, header=None).fillna("")
@@ -199,7 +199,7 @@ def app_file_validator():
                                 if not has_format or not is_valid_data:
                                     reason = "❌ Format ผิด" if not has_format else "❌ ขาดเวลา"
                                     error_list.append({"Row": row_idx, "Value": str(val), "Status": reason})
-                    status.update(label="Auditing Complete!", state="complete", expanded=False)
+                    status.update(label="Checking Complete!", state="complete", expanded=False)
 
                 if not (f_errors or missing_data or extra_data or d_errors or k_errors):
                     st.balloons(); st.success("✨ ข้อมูลถูกต้องสมบูรณ์ 100%")
