@@ -244,7 +244,7 @@ def app_washing_processor():
 
     col_f1, col_f2 = st.columns(2)
     with col_f1:
-        file1 = st.file_uploader("📂 Lot List File", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
+        file1 = st.file_uploader("📂 Lot List File (ไฟล์จาก Part Vintage)", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
     with col_f2:
         file2 = st.file_uploader("📂 Barcode Data File", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
 
