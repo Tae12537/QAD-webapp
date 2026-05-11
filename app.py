@@ -319,7 +319,7 @@ def app_washing_processor():
 if st.session_state.current_app == "Main Menu":
     st.markdown("<div style='height: 70px;'></div>", unsafe_allow_html=True)
     st.markdown("<p class='main-title'>QAD Support Application</p>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #64748b; font-size: 60px; font-weight: 400;'>QAD Support Application</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #64748b; font-size: 30px; font-weight: 400;'></p>", unsafe_allow_html=True)
     st.markdown("<div style='height: 90px;'></div>", unsafe_allow_html=True)
     
     # ใช้ 3 คอลัมน์โดยให้คอลัมน์กลางกว้างที่สุดเพื่อดึงเข้าหาศูนย์กลาง
