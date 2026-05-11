@@ -235,81 +235,163 @@ def app_file_validator():
     except Exception as e: st.error(f"เกิดข้อผิดพลาด: {e}")
 
 # ==========================================
-# APP 2: WASHING DATE PROCESSOR
+# APP 2: WASHING DATE PROCESSOR (FIXED VERSION)
 # ==========================================
 def app_washing_processor():
     st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>ตรวจวันล้าง ⚡</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>คำนวณวันล้างแบบรวดเร็วและแม่นยำ ⚡</p>", unsafe_allow_html=True)
     
     with st.sidebar:
         st.markdown("### 🧭 Control Panel")
         if st.button("🏠 Home Menu", use_container_width=True):
             go_to_menu()
-        if st.button("🔄 Refresh System", use_container_width=True):
-            st.session_state.output, st.session_state.summary, st.session_state.file = None, None, None
+        if st.button("🔄 Reset System", use_container_width=True):
+            st.session_state.output = None
+            st.session_state.summary = None
+            st.session_state.file = None
             st.session_state.uploader_key = st.session_state.get('uploader_key', 0) + 1
             st.rerun()
 
     if "uploader_key" not in st.session_state:
         st.session_state.uploader_key = 0
 
+    # UI ส่วนการอัปโหลด
     col_f1, col_f2 = st.columns(2)
     with col_f1:
-        file1 = st.file_uploader("📂 Lot List File (จาก Part Vintage)", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
+        file1 = st.file_uploader("📂 Upload File 1 (Lot List)", type=["xls", "xlsx", "csv"], key=f"file1_{st.session_state.uploader_key}")
     with col_f2:
-        file2 = st.file_uploader("📂 Barcode Data File (จากเว็บ PDD)", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
+        file2 = st.file_uploader("📂 Upload File 2 (Barcode Data)", type=["xls", "xlsx", "csv"], key=f"file2_{st.session_state.uploader_key}")
 
-    def read_excel(file):
-        try: return pd.read_excel(file, engine="openpyxl", header=None)
-        except: return pd.read_excel(file, engine="xlrd", header=None)
+    def read_excel_safely(file):
+        try:
+            return pd.read_excel(file, engine="openpyxl", header=None)
+        except:
+            return pd.read_excel(file, engine="xlrd", header=None)
 
-    if st.button("🚀 เริ่มการประมวลผล", use_container_width=True):
+    # ฟังก์ชันอ่านไฟล์ 1 (Lot List)
+    def process_file1(file):
+        df = read_excel_safely(file)
+        # อ่านจากแถว 17 (index 16) คอลัมน์ F (index 5)
+        raw_data = df.iloc[16:, 5].dropna()
+        lot_list = [str(val).strip() for val in raw_data if str(val).strip() != "" and str(val).lower() != "lot/serial"]
+        return pd.DataFrame({"Lot": lot_list})
+
+    # ฟังก์ชันอ่านไฟล์ 2 (Barcode/Runcard)
+    def process_file2(file):
+        df = read_excel_safely(file)
+        header_row = None
+        # วนลูปหาแถวที่มี Header จริงๆ
+        for i in range(min(25, len(df))):
+            row_values = df.iloc[i].astype(str).str.lower().values
+            if any("runcard" in val for val in row_values) and any("barcode" in val for val in row_values):
+                header_row = i
+                break
+        
+        if header_row is None:
+            return None
+            
+        df.columns = df.iloc[header_row]
+        df = df[header_row + 1:].copy()
+        df.columns = df.columns.astype(str).str.strip().str.lower()
+        
+        # ค้นหาชื่อคอลัมน์ที่แท้จริง (เผื่อชื่อไม่เป๊ะ)
+        col_lot = next((c for c in df.columns if "runcard" in c), None)
+        col_bar = next((c for c in df.columns if "barcode" in c), None)
+        col_date = next((c for c in df.columns if "packed" in c and "date" in c), None)
+        
+        if not all([col_lot, col_bar, col_date]):
+            return None
+            
+        df_out = df[[col_lot, col_bar, col_date]].copy()
+        df_out.columns = ["Lot", "Barcode No", "Packed Date"]
+        df_out["Lot"] = df_out["Lot"].astype(str).str.strip()
+        df_out["Packed Date"] = pd.to_datetime(df_out["Packed Date"], errors="coerce")
+        return df_out.dropna(subset=["Lot"])
+
+    # ฟังก์ชันดึง WW และ Day จาก Barcode
+    def extract_logic(barcode):
+        s = str(barcode).strip()
+        match = re.search('[A-Za-z]', s)
+        if not match: return pd.Series([None, None])
+        start = match.start()
+        code = s[start+3:start+6] # ดึงตัวเลข 3 หลักต่อจากตัวอักษร+2
+        if code.isdigit() and len(code) == 3:
+            return pd.Series([int(code[:2]), int(code[2])])
+        return pd.Series([None, None])
+
+    if st.button("🚀 START PROCESSING", use_container_width=True):
         if not file1 or not file2:
-            st.warning("อ๊ะ! อย่าลืมอัปโหลดไฟล์ให้ครบทั้ง 2 ช่องนะครับ")
+            st.warning("⚠️ กรุณาอัปโหลดไฟล์ให้ครบทั้ง 2 ช่อง")
         else:
-            with st.spinner('⚡ ระบบกำลังประมวลผลอย่างชาญฉลาด...'):
-                df1_raw = read_excel(file1)
-                df1 = pd.DataFrame({"Lot": [str(v).strip() for v in df1_raw.iloc[16:, 5] if not pd.isna(v) and str(v).strip() != ""]})
-                df2_raw = read_excel(file2)
-                h_row = next((i for i in range(20) if df2_raw.iloc[i].astype(str).str.lower().str.contains("runcard").any()), None)
-                if h_row is not None:
-                    df2_raw.columns = df2_raw.iloc[h_row]
-                    df2 = df2_raw[h_row + 1:].copy()
-                    df2.columns = df2.columns.astype(str).str.strip().str.lower()
-                    lot_c = [c for c in df2.columns if "runcard" in c][0]
-                    bar_c = [c for c in df2.columns if "barcode" in c][0]
-                    pak_c = [c for c in df2.columns if "packed" in c and "date" in c][0]
-                    df2_final = df2[[lot_c, bar_c, pak_c]].dropna(subset=[lot_c])
-                    df2_final.columns = ["Lot", "Barcode No", "Packed Date"]
-                    df2_final["Packed Date"] = pd.to_datetime(df2_final["Packed Date"], errors="coerce")
-                    merged = pd.merge(df1, df2_final, on="Lot", how="left").drop_duplicates(subset=["Lot"])
-                    def ext_ww(b):
-                        m = re.search('[A-Za-z]', str(b)); return (int(str(b)[m.start()+3:m.start()+5]), int(str(b)[m.start()+5])) if m and str(b)[m.start()+3:m.start()+6].isdigit() else (None, None)
-                    merged[['WW', 'Day']] = merged['Barcode No'].apply(lambda x: pd.Series(ext_ww(x)))
-                    db = pd.read_csv("database.txt"); db["Date"] = pd.to_datetime(db["Date"], format="%d-%b-%Y", errors="coerce")
-                    def find_d(r, d_db):
-                        if pd.isna(r["WW"]) or pd.isna(r["Day"]) or pd.isna(r["Packed Date"]): return None
-                        c = d_db[(d_db["WW"] == r["WW"]) & (d_db["Day"] == r["Day"])].copy()
-                        if c.empty: return None
-                        c["diff"] = (c["Date"] - r["Packed Date"]).abs()
-                        return c.sort_values("diff").iloc[0]["Date"]
-                    merged["Washing Date"] = merged.apply(lambda r: find_d(r, db), axis=1)
-                    out = merged[["Lot", "Barcode No", "WW", "Day", "Washing Date"]].copy()
-                    out["Washing Date"] = pd.to_datetime(out["Washing Date"]).dt.strftime("%d-%b-%Y")
-                    sum_df = out.groupby("Washing Date")["Lot"].count().reset_index().rename(columns={"Lot": "Total Lot"})
+            try:
+                with st.spinner('กำลังวิเคราะห์ข้อมูล...'):
+                    df1 = process_file1(file1)
+                    df2 = process_file2(file2)
+                    
+                    if df2 is None:
+                        st.error("❌ หาหัวตารางใน File 2 ไม่เจอ (ต้องมีคำว่า Runcard และ Barcode)")
+                        return
+
+                    # Merge ข้อมูล
+                    merged = pd.merge(df1, df2, on="Lot", how="left").drop_duplicates(subset=["Lot"])
+                    merged[['WW', 'Day']] = merged['Barcode No'].apply(extract_logic)
+                    
+                    # โหลด Database
+                    if not os.path.exists("database.txt"):
+                        st.error("❌ ไม่พบไฟล์ database.txt ในระบบ")
+                        return
+                        
+                    db = pd.read_csv("database.txt")
+                    db["Date"] = pd.to_datetime(db["Date"], format="%d-%b-%Y", errors="coerce")
+
+                    def find_best_date(row, d_db):
+                        if pd.isna(row["WW"]) or pd.isna(row["Day"]) or pd.isna(row["Packed Date"]): 
+                            return None
+                        cands = d_db[(d_db["WW"] == row["WW"]) & (d_db["Day"] == row["Day"])].copy()
+                        if cands.empty: return None
+                        cands["diff"] = (cands["Date"] - row["Packed Date"]).abs()
+                        return cands.sort_values("diff").iloc[0]["Date"]
+
+                    merged["Washing Date Raw"] = merged.apply(lambda r: find_best_date(r, db), axis=1)
+                    
+                    # เตรียมผลลัพธ์
+                    output = merged[["Lot", "Barcode No", "WW", "Day", "Washing Date Raw"]].copy()
+                    output["Washing Date"] = pd.to_datetime(output["Washing Date Raw"]).dt.strftime("%d-%b-%Y")
+                    
+                    # สรุปผล
+                    summary = output.dropna(subset=["Washing Date Raw"])
+                    summary = summary.groupby("Washing Date")["Lot"].count().reset_index()
+                    summary.columns = ["Washing Date", "Total Lot"]
+
+                    # บันทึกลง Buffer
                     buf = io.BytesIO()
                     with pd.ExcelWriter(buf, engine="openpyxl") as writer:
-                        out.to_excel(writer, index=False, sheet_name="Result")
-                        sum_df.to_excel(writer, index=False, sheet_name="Summary")
-                    st.session_state.output, st.session_state.summary, st.session_state.file = out, sum_df, buf.getvalue()
+                        output.drop(columns=["Washing Date Raw"]).to_excel(writer, index=False, sheet_name="Result")
+                        summary.to_excel(writer, index=False, sheet_name="Summary")
+                    
+                    st.session_state.output = output.drop(columns=["Washing Date Raw"])
+                    st.session_state.summary = summary
+                    st.session_state.file = buf.getvalue()
+                    
+            except Exception as e:
+                st.error(f"💥 เกิดข้อผิดพลาดขณะประมวลผล: {str(e)}")
 
+    # แสดงผลลัพธ์
     if st.session_state.get("output") is not None:
-        st.success("✅ ประมวลผลสำเร็จแล้วครับ!")
-        t1, t2 = st.tabs(["💎 รายละเอียดผลลัพธ์", "📈 สรุปข้อมูล"])
-        with t1: st.dataframe(st.session_state.output, use_container_width=True)
-        with t2: st.dataframe(st.session_state.summary, use_container_width=True)
-        st.download_button("📥 ดาวน์โหลดไฟล์ผลลัพธ์ (.XLSX)", st.session_state.file, f"Result_{datetime.datetime.now().strftime('%H%M')}.xlsx", use_container_width=True)
-
+        st.success("✅ ประมวลผลสำเร็จ!")
+        tab1, tab2 = st.tabs(["💎 Result Details", "📈 Summary View"])
+        with tab1:
+            st.dataframe(st.session_state.output, use_container_width=True)
+        with tab2:
+            st.dataframe(st.session_state.summary, use_container_width=True)
+        
+        st.download_button(
+            label="📥 DOWNLOAD EXCEL RESULT",
+            data=st.session_state.file,
+            file_name=f"Washing_Date_{datetime.datetime.now().strftime('%H%M')}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
 # ==========================================
 # MAIN ROUTING - UPDATED FOR PERFECT CENTERING
 # ==========================================
