@@ -248,7 +248,7 @@ def app_washing_processor():
         st.markdown("### 🧭 Control Panel")
         if st.button("🏠 Home Menu", use_container_width=True):
             go_to_menu()
-        if st.button("🔄 Clear Buffer", use_container_width=True):
+        if st.button("🔄 Refresh System", use_container_width=True):
             st.session_state.output, st.session_state.summary, st.session_state.file = None, None, None
             st.session_state.uploader_key = st.session_state.get('uploader_key', 0) + 1
             st.rerun()
