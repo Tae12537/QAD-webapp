@@ -327,7 +327,7 @@ if st.session_state.current_app == "Main Menu":
         st.markdown("### 📈 Data Processing")
         if st.button("📊 Washing Date\nProcessor"):
             st.session_state.current_app = "Processor"; st.rerun()
-        st.caption("ระบบดึงข้อมูลวันที่ล้างจาก Barcode และจับคู่ Lot")
+        st.caption("ระบบดึงข้อมูลวันที่ล้างจาก Lot")
 
     st.markdown("<br><br><p style='text-align: center; color: #94a3b8;'>Production Tools v2.0 • Premium Interface</p>", unsafe_allow_html=True)
 
