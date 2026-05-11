@@ -209,7 +209,7 @@ def app_file_validator():
                     st.success("✨ ยินดีด้วย! ข้อมูลถูกต้องสมบูรณ์ 100%")
                 else:
                     if f_errors:
-                        st.error("⚠️ หัวตารางไม่ตรง (F3/F5)")
+                        st.error("⚠️ part no. / drawing no. ไม่ถูกต้อง (ช่อง F3/F5)")
                         st.table(pd.DataFrame(f_errors))
 
                     col_mis, col_ext = st.columns(2)
