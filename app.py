@@ -7,87 +7,97 @@ import datetime
 from openpyxl import load_workbook
 
 # ==========================================
-# 🎨 LUXURY & CUTE UI CUSTOMIZATION
+# 💎 PREMIER LUXURY UI SETTINGS
 # ==========================================
-st.set_page_config(page_title="QAD System Hub", layout="wide") # ปรับเป็น Wide เพื่อความโปร่ง
+st.set_page_config(page_title="QAD System Hub", layout="wide")
 
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;600&family=Inter:wght@300;500;700&display=swap');
 
-    /* พื้นหลังแบบ Gradient ไล่สีนุ่มๆ */
+    /* พื้นหลังแบบ Soft Gradient */
     .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        font-family: 'Kanit', sans-serif;
+        background: radial-gradient(circle at top right, #fdfcfb 0%, #e2d1c3 100%);
+        font-family: 'Inter', 'Kanit', sans-serif;
     }
 
-    /* ปรับแต่ง Container หลักให้ดูเหมือนกระจก */
-    [data-testid="stVerticalBlock"] > div:has(div.stButton) {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+    /* ตกแต่ง Sidebar ให้ดูแพง */
+    [data-testid="stSidebar"] {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* ปุ่มเมนูหลัก - สไตล์ Luxury */
+    /* Card Container สำหรับเนื้อหา */
+    div.block-container {
+        padding-top: 2rem;
+    }
+
+    /* ปุ่มเมนูหลักสไตล์ Premium */
     div.stButton > button:first-child {
-        width: 100%;
-        height: 100px;
-        border-radius: 18px;
-        border: none;
-        background: white;
-        color: #1e3a8a;
-        font-size: 22px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background: #ffffff;
+        color: #0f172a;
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        height: 120px;
+        font-size: 24px;
+        font-weight: 700;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
     div.stButton > button:hover {
         background: #1e3a8a;
-        color: white;
-        transform: translateY(-5px) scale(1.02);
-        box-shadow: 0 12px 20px rgba(30, 58, 138, 0.2);
+        color: #ffffff;
+        border-color: #1e3a8a;
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(30, 58, 138, 0.25);
     }
 
-    /* ตกแต่ง Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: rgba(255, 255, 255, 0.5);
-        backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(0,0,0,0.05);
+    /* ชื่อแอปหลัก */
+    .main-title {
+        font-size: 64px;
+        font-weight: 700;
+        background: linear-gradient(to right, #1e3a8a, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0px;
+        text-align: center;
     }
 
-    /* หัวข้อภาษาไทยให้ดูเด่นขึ้น */
-    h1 {
-        font-weight: 600;
+    /* หัวข้อภายในแอป */
+    h1, h2 {
+        font-weight: 600 !important;
+        color: #1e293b !important;
+        letter-spacing: -0.5px;
+    }
+
+    /* ปรับแต่ง Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 24px;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        white-space: pre;
+        background-color: transparent;
+        border-radius: 8px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .stTabs [aria-selected="true"] {
         color: #1e3a8a !important;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
-        margin-bottom: 30px !important;
-    }
-    
-    h2, h3 {
-        color: #334155 !important;
-        font-weight: 400;
+        border-bottom-color: #1e3a8a !important;
     }
 
-    /* ปรับแต่ง File Uploader */
-    .stFileUploader section {
-        background-color: white;
-        border-radius: 15px;
-        border: 2px dashed #cbd5e1;
-        padding: 20px;
-    }
-
-    /* สไตล์ตารางให้ดูสะอาด */
-    .styled-table {
-        border-radius: 10px;
+    /* Style สำหรับ Dataframe */
+    [data-testid="stDataFrame"] {
+        border-radius: 16px;
         overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     </style>
 """, unsafe_allow_html=True)
@@ -103,17 +113,17 @@ def go_to_menu():
     st.rerun()
 
 # ==========================================
-# APP 1: FILE VALIDATOR (Smart DateTime Check)
+# APP 1: FILE VALIDATOR
 # ==========================================
 def app_file_validator():
-    st.markdown("<h1 style='text-align: center;'>📁 File Validator</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #1e3a8a;'>📁 File Validator</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b;'>ตรวจสอบโครงสร้างและความถูกต้องของไฟล์ RAMP</p>", unsafe_allow_html=True)
     
     with st.sidebar:
-        st.markdown("### 🛠️ Navigation")
-        if st.button("⬅️ Back to Home"):
+        st.markdown("### 🧭 Control Panel")
+        if st.button("🏠 Home Menu", use_container_width=True):
             go_to_menu()
-        st.divider()
-        if st.button("🔄 Reset This App"):
+        if st.button("🔄 Refresh System", use_container_width=True):
             for key in list(st.session_state.keys()):
                 if key != "current_app": del st.session_state[key]
             st.session_state.reset_counter = st.session_state.get('reset_counter', 0) + 1
@@ -137,20 +147,19 @@ def app_file_validator():
 
     try:
         available_models = get_available_models()
-        model_list = ["-- Please Select Model --"] + sorted(list(available_models.keys()))
+        model_list = ["-- Select Reference Model --"] + sorted(list(available_models.keys()))
         
-        # จัดระเบียบ Layout การเลือกไฟล์
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            selected_model_name = st.selectbox("🎯 1. เลือกโมเดลอ้างอิง", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}")
+        c1, c2 = st.columns(2)
+        with c1:
+            selected_model_name = st.selectbox("📍 Reference Model", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}")
         
-        if selected_model_name != "-- Please Select Model --":
-            with col2:
-                uploaded_file = st.file_uploader("📥 2. อัปโหลดไฟล์ที่ต้องการตรวจ", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}")
+        if selected_model_name != "-- Select Reference Model --":
+            with c2:
+                uploaded_file = st.file_uploader("📥 Target File", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}")
 
             if uploaded_file:
-                st.divider()
-                with st.spinner('กำลังตรวจสอบความถูกต้อง...'):
+                st.write("---")
+                with st.status("🔍 Auditing File Integrity...", expanded=True) as status:
                     wb = load_workbook(uploaded_file, data_only=False)
                     ws = wb[TARGET_SHEET]
                     df_ref = pd.read_excel(available_models[selected_model_name], sheet_name=TARGET_SHEET, header=None).fillna("")
@@ -190,38 +199,42 @@ def app_file_validator():
                                 if not has_format or not is_valid_data:
                                     reason = "❌ Format ผิด" if not has_format else "❌ ขาดเวลา"
                                     error_list.append({"Row": row_idx, "Value": str(val), "Status": reason})
+                    status.update(label="Auditing Complete!", state="complete", expanded=False)
 
-                    st.markdown("### 📋 ผลการตรวจสอบ")
-                    if not (f_errors or missing_data or extra_data or d_errors or k_errors):
-                        st.balloons(); st.success("🎉 ยอดเยี่ยม! ข้อมูลและรูปแบบถูกต้องทั้งหมด")
-                    else:
-                        if f_errors: st.warning("⚠️ ข้อมูลหัวตาราง (F3/F5) ไม่ตรงกับต้นฉบับ"); st.table(pd.DataFrame(f_errors))
-                        if missing_data: st.info("⚠️ ข้อมูลหายไปในบางช่อง (Missing Data)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
-                        if extra_data: st.error("🚫 พบข้อมูลเกินมาในช่องที่ควรว่าง (Extra Data)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
-                        
-                        res_c1, res_c2 = st.columns(2)
-                        with res_c1:
-                            st.markdown("🔍 **Washing Date (Col D)**")
-                            if d_errors: st.dataframe(pd.DataFrame(d_errors), use_container_width=True)
-                            else: st.write("✅ สมบูรณ์")
-                        with res_c2:
-                            st.markdown("🔍 **Finish Date (Col K)**")
-                            if k_errors: st.dataframe(pd.DataFrame(k_errors), use_container_width=True)
-                            else: st.write("✅ สมบูรณ์")
-    except Exception as e: st.error(f"ระบบขัดข้อง: {e}")
+                if not (f_errors or missing_data or extra_data or d_errors or k_errors):
+                    st.balloons(); st.success("✨ ข้อมูลถูกต้องสมบูรณ์ 100%")
+                else:
+                    if f_errors: st.warning("⚠️ หัวตารางไม่ตรง (F3/F5)"); st.table(pd.DataFrame(f_errors))
+                    
+                    res_c1, res_c2 = st.columns(2)
+                    with res_c1:
+                        if missing_data: 
+                            st.markdown("📉 **Missing Data**")
+                            st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
+                        if d_errors:
+                            st.markdown("🔍 **Washing Date Issues**")
+                            st.dataframe(pd.DataFrame(d_errors), use_container_width=True)
+                    with res_c2:
+                        if extra_data:
+                            st.markdown("🚫 **Extra Data**")
+                            st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+                        if k_errors:
+                            st.markdown("🔍 **Finish Date Issues**")
+                            st.dataframe(pd.DataFrame(k_errors), use_container_width=True)
+    except Exception as e: st.error(f"Error: {e}")
 
 # ==========================================
 # APP 2: WASHING DATE PROCESSOR
 # ==========================================
 def app_washing_processor():
-    st.markdown("<h1 style='text-align: center;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #1e3a8a;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b;'>จับคู่ Lot และคำนวณวันที่ล้างแบบอัตโนมัติ</p>", unsafe_allow_html=True)
     
     with st.sidebar:
-        st.markdown("### 🛠️ Navigation")
-        if st.button("⬅️ Back to Home"):
+        st.markdown("### 🧭 Control Panel")
+        if st.button("🏠 Home Menu", use_container_width=True):
             go_to_menu()
-        st.divider()
-        if st.button("🔄 Reset Process"):
+        if st.button("🔄 Clear Buffer", use_container_width=True):
             st.session_state.output, st.session_state.summary, st.session_state.file = None, None, None
             st.session_state.uploader_key = st.session_state.get('uploader_key', 0) + 1
             st.rerun()
@@ -231,22 +244,21 @@ def app_washing_processor():
 
     col_f1, col_f2 = st.columns(2)
     with col_f1:
-        file1 = st.file_uploader("📂 อัปโหลด File 1 (Lot List)", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
+        file1 = st.file_uploader("📂 Lot List File", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
     with col_f2:
-        file2 = st.file_uploader("📂 อัปโหลด File 2 (Barcode Data)", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
+        file2 = st.file_uploader("📂 Barcode Data File", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
 
     def read_excel(file):
         try: return pd.read_excel(file, engine="openpyxl", header=None)
         except: return pd.read_excel(file, engine="xlrd", header=None)
 
-    if st.button("🚀 เริ่มประมวลผลข้อมูล"):
+    if st.button("🚀 EXECUTE PROCESSING", use_container_width=True):
         if not file1 or not file2:
-            st.warning("⚠️ กรุณาอัปโหลดไฟล์ให้ครบทั้ง 2 ไฟล์ก่อนเริ่มงาน")
+            st.warning("กรุณาอัปโหลดไฟล์ให้ครบถ้วน")
         else:
-            with st.spinner('กำลังจับคู่ข้อมูลและคำนวณวันที่...'):
+            with st.spinner('⚡ รันระบบอัจฉริยะกำลังประมวลผล...'):
                 df1_raw = read_excel(file1)
                 df1 = pd.DataFrame({"Lot": [str(v).strip() for v in df1_raw.iloc[16:, 5] if not pd.isna(v) and str(v).strip() != ""]})
-                
                 df2_raw = read_excel(file2)
                 h_row = next((i for i in range(20) if df2_raw.iloc[i].astype(str).str.lower().str.contains("runcard").any()), None)
                 if h_row is not None:
@@ -256,35 +268,24 @@ def app_washing_processor():
                     lot_c = [c for c in df2.columns if "runcard" in c][0]
                     bar_c = [c for c in df2.columns if "barcode" in c][0]
                     pak_c = [c for c in df2.columns if "packed" in c and "date" in c][0]
-                    
                     df2_final = df2[[lot_c, bar_c, pak_c]].dropna(subset=[lot_c])
                     df2_final.columns = ["Lot", "Barcode No", "Packed Date"]
                     df2_final["Packed Date"] = pd.to_datetime(df2_final["Packed Date"], errors="coerce")
-                    
                     merged = pd.merge(df1, df2_final, on="Lot", how="left").drop_duplicates(subset=["Lot"])
-                    
                     def ext_ww(b):
-                        m = re.search('[A-Za-z]', str(b))
-                        if not m: return None, None
-                        c = str(b)[m.start()+3:m.start()+6]
-                        return (int(c[:2]), int(c[2])) if (len(c)==3 and c.isdigit()) else (None, None)
-                    
+                        m = re.search('[A-Za-z]', str(b)); return (int(str(b)[m.start()+3:m.start()+5]), int(str(b)[m.start()+5])) if m and str(b)[m.start()+3:m.start()+6].isdigit() else (None, None)
                     merged[['WW', 'Day']] = merged['Barcode No'].apply(lambda x: pd.Series(ext_ww(x)))
-                    db = pd.read_csv("database.txt")
-                    db["Date"] = pd.to_datetime(db["Date"], format="%d-%b-%Y", errors="coerce")
-                    
+                    db = pd.read_csv("database.txt"); db["Date"] = pd.to_datetime(db["Date"], format="%d-%b-%Y", errors="coerce")
                     def find_d(r, d_db):
                         if pd.isna(r["WW"]) or pd.isna(r["Day"]) or pd.isna(r["Packed Date"]): return None
                         c = d_db[(d_db["WW"] == r["WW"]) & (d_db["Day"] == r["Day"])].copy()
                         if c.empty: return None
                         c["diff"] = (c["Date"] - r["Packed Date"]).abs()
                         return c.sort_values("diff").iloc[0]["Date"]
-
                     merged["Washing Date"] = merged.apply(lambda r: find_d(r, db), axis=1)
                     out = merged[["Lot", "Barcode No", "WW", "Day", "Washing Date"]].copy()
                     out["Washing Date"] = pd.to_datetime(out["Washing Date"]).dt.strftime("%d-%b-%Y")
                     sum_df = out.groupby("Washing Date")["Lot"].count().reset_index().rename(columns={"Lot": "Total Lot"})
-                    
                     buf = io.BytesIO()
                     with pd.ExcelWriter(buf, engine="openpyxl") as writer:
                         out.to_excel(writer, index=False, sheet_name="Result")
@@ -292,46 +293,37 @@ def app_washing_processor():
                     st.session_state.output, st.session_state.summary, st.session_state.file = out, sum_df, buf.getvalue()
 
     if st.session_state.get("output") is not None:
-        st.success("✅ ประมวลผลเสร็จสิ้น!")
-        tab1, tab2 = st.tabs(["📄 รายละเอียดข้อมูล", "📊 สรุปผล"])
-        with tab1:
-            st.dataframe(st.session_state.output, use_container_width=True)
-        with tab2:
-            st.dataframe(st.session_state.summary, use_container_width=True)
-        
-        st.download_button(
-            label="📥 ดาวน์โหลดไฟล์ Excel (Result)",
-            data=st.session_state.file,
-            file_name=f"Result_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+        st.success("✅ ระบบประมวลผลเสร็จสมบูรณ์")
+        t1, t2 = st.tabs(["💎 Result Details", "📈 Summary View"])
+        with t1: st.dataframe(st.session_state.output, use_container_width=True)
+        with t2: st.dataframe(st.session_state.summary, use_container_width=True)
+        st.download_button("📥 DOWNLOAD RESULT (.XLSX)", st.session_state.file, f"Result_{datetime.datetime.now().strftime('%H%M')}.xlsx", use_container_width=True)
 
 # ==========================================
 # MAIN ROUTING
 # ==========================================
 if st.session_state.current_app == "Main Menu":
-    st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 10px;'>🏭 QAD System Hub</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b; font-size: 18px;'>Support Application for QAD</p>", unsafe_allow_html=True)
-    st.write("---")
+    st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
+    st.markdown("<p class='main-title'>QAD System Hub</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b; font-size: 20px; font-weight: 300;'>Premium Internal Management Solution</p>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
-    # วางปุ่มใน Layout ที่สวยงาม
-    empty_col_left, c1, col_gap, c2, empty_col_right = st.columns([0.5, 2, 0.2, 2, 0.5])
+    col_l, c1, gap, c2, col_r = st.columns([0.4, 2, 0.3, 2, 0.4])
     
     with c1:
-        st.markdown("### 📂 Data Audit")
-        if st.button("📁 File Validator\n(ตรวจสอบรูปแบบไฟล์)"):
+        st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Data Integrity</h3>", unsafe_allow_html=True)
+        if st.button("📁 File Validator"):
             st.session_state.current_app = "Validator"; st.rerun()
-        st.caption("ใช้สำหรับตรวจเช็คความถูกต้องของ Format ก่อนส่งงาน")
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 14px;'>ความแม่นยำคือหัวใจสำคัญ<br>ตรวจสอบ Format ไฟล์ RAMP ให้เป๊ะทุกจุด</p>", unsafe_allow_html=True)
 
     with c2:
-        st.markdown("### 📈 Data Processing")
-        if st.button("📊 Washing Date\nProcessor"):
+        st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Efficiency Boost</h3>", unsafe_allow_html=True)
+        if st.button("📊 Washing Date Processor"):
             st.session_state.current_app = "Processor"; st.rerun()
-        st.caption("ระบบดึงข้อมูลวันที่ล้างจาก Lot")
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 14px;'>ลดเวลาการทำงานซ้ำซ้อน<br>จับคู่ข้อมูลและออกรายงานในคลิกเดียว</p>", unsafe_allow_html=True)
 
-    st.markdown("<br><br><p style='text-align: center; color: #94a3b8;'>Production Tools v2.0 • Premium Interface</p>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #cbd5e1; font-size: 12px;'>© 2026 QAD Engineering | System Excellence v2.5</p>", unsafe_allow_html=True)
 
-elif st.session_state.current_app == "Validator": 
-    app_file_validator()
-elif st.session_state.current_app == "Processor": 
-    app_washing_processor()
+elif st.session_state.current_app == "Validator": app_file_validator()
+elif st.session_state.current_app == "Processor": app_washing_processor()
