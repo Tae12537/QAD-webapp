@@ -447,7 +447,7 @@ if st.session_state.current_app == "Main Menu":
         c1, c2 = st.columns(2, gap="large")
         
         with c1:
-            st.markdown("### 📋 ตรวจเช็ค Format ไฟล์")
+            st.markdown("### 📋 ตรวจเช็ค Format ไฟล์ QPM")
             st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
             if st.button("📁 File Validator"):
                 st.session_state.current_app = "Validator"; st.rerun()
