@@ -246,7 +246,7 @@ def app_washing_processor():
     with col_f1:
         file1 = st.file_uploader("📂 Lot List File (ไฟล์จาก Part Vintage)", type=["xls", "xlsx", "csv"], key=f"p1_{st.session_state.uploader_key}")
     with col_f2:
-        file2 = st.file_uploader("📂 Barcode Data File", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
+        file2 = st.file_uploader("📂 Barcode Data File (File download จากเว็บ PDD)", type=["xls", "xlsx", "csv"], key=f"p2_{st.session_state.uploader_key}")
 
     def read_excel(file):
         try: return pd.read_excel(file, engine="openpyxl", header=None)
