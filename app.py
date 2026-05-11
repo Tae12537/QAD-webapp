@@ -8,7 +8,7 @@ from openpyxl import load_workbook
 # ==========================================
 # 🎨 UI CUSTOMIZATION (Electric Blue Theme)
 # ==========================================
-st.set_page_config(page_title="Production Tools Hub", layout="centered")
+st.set_page_config(page_title="QAD System Hub", layout="centered")
 
 st.markdown("""
     <style>
