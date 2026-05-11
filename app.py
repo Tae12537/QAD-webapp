@@ -7,107 +7,158 @@ import datetime
 from openpyxl import load_workbook
 
 # ==========================================
-# 💎 PREMIER LUXURY & CUTE UI SETTINGS
+# 💎 UI CUSTOMIZATION (ANGULAR LUXURY THEME)
 # ==========================================
+# ปรับ layout เป็น wide เพื่อความภูมิฐานและใช้พื้นที่ได้เต็มที่
 st.set_page_config(page_title="QAD System Hub", layout="wide")
 
 st.markdown("""
     <style>
-    /* Import Fonts: Itim (กลมมนน่ารักแต่อ่านง่ายกว่า), Mali (ใช้ในส่วนรอง) */
-    @import url('https://fonts.googleapis.com/css2?family=Mali:wght@300;500;700&family=Itim&family=Inter:wght@300;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Inter:wght@300;500;700&display=swap');
 
-    /* พื้นหลังแบบ Soft Gradient */
+    /* พื้นหลังโทนเข้มแบบผู้บริหาร (Deep Slate) */
     .stApp {
-        background: radial-gradient(circle at top right, #fdfcfb 0%, #e2d1c3 100%);
-        font-family: 'Itim', 'Mali', sans-serif;
+        background-color: #111827;
+        color: #f8fafc;
+        font-family: 'Inter', 'Kanit', sans-serif;
     }
 
-    /* ฟอนต์ภาษาไทยหลักใช้ Itim เพื่อให้อ่านง่ายขึ้นแต่ยังน่ารัก */
-    html, body, [class*="css"], .stMarkdown, p, h1, h2, h3, label, button {
-        font-family: 'Itim', sans-serif !important;
-    }
-
-    /* ตกแต่ง Sidebar */
+    /* ตกแต่ง Sidebar ให้ดูเป็นมืออาชีพและคมชัด */
     [data-testid="stSidebar"] {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(20px);
-        border-right: 1px solid rgba(0,0,0,0.05);
+        background-color: #1f2937;
+        border-right: 1px solid #374151;
     }
 
+    /* เนื้อหาหลัก */
     div.block-container {
         padding-top: 2rem;
     }
 
-    /* ปุ่มเมนูหลักสไตล์ Premium */
+    /* =========================================
+       ปุ่มเมนูหลักสไตล์ ANGULAR LUXURY
+       เน้นเหลี่ยมมุม ความโปร่งแสง และเส้นขอบเงิน/ทอง
+       ========================================= */
     div.stButton > button:first-child {
-        background: #ffffff;
-        color: #1e3a8a;
-        border: 2px solid #e2e8f0;
-        border-radius: 30px;
-        height: 140px;
-        width: 100%;
-        font-size: 26px !important;
-        font-weight: 700;
-        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: rgba(255, 255, 255, 0.03);
+        color: #f8fafc;
+        border: 1px solid #374151;
+        border-radius: 0px; /* บังคับเหลี่ยมเป๊ะ */
+        height: 120px;
+        font-size: 24px;
+        font-weight: 600;
         text-transform: uppercase;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
+        letter-spacing: 2px; /* เพิ่มช่องว่างระหว่างอักษรให้ดูแพง */
+        transition: all 0.3s ease-in-out;
+        box-shadow: none;
     }
 
+    /* Hover Effect: เปลี่ยนเป็นสีเน้นและขยายเล็กน้อย */
     div.stButton > button:hover {
-        background: #1e3a8a;
-        color: #ffffff !important;
-        border-color: #1e3a8a;
-        transform: scale(1.05);
-        box-shadow: 0 20px 30px -10px rgba(30, 58, 138, 0.3);
+        background: rgba(59, 130, 246, 0.1);
+        color: #60a5fa;
+        border: 1px solid #60a5fa;
+        transform: scale(1.02);
     }
 
-    /* ชื่อแอปหลัก - ปรับขนาดใหญ่พิเศษ (110px) และเปลี่ยนฟอนต์ให้อ่านง่ายขึ้น */
+    /* ปุ่มกลับหน้าหลักใน Sidebar */
+    [data-testid="stSidebar"] div.stButton > button {
+        height: 50px;
+        font-size: 16px;
+        background-color: #374151;
+        border: 1px solid #4b5563;
+    }
+
+    /* ชื่อแอปหลัก - ปรับให้ดูโมเดิร์นแต่ยังเด่น */
     .main-title {
-        font-family: 'Itim', cursive !important;
-        font-size: 110px; /* ขยายขนาดใหญ่ขึ้น */
+        font-size: 60px;
         font-weight: 700;
-        background: linear-gradient(to right, #1e3a8a, #3b82f6, #1e3a8a);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #f8fafc;
         margin-bottom: 5px;
         text-align: center;
-        filter: drop-shadow(3px 5px 8px rgba(0,0,0,0.12));
-        line-height: 1.2;
+        letter-spacing: -1px;
     }
 
-    .center-text {
+    /* คำอธิบายใต้ชื่อแอป */
+    .sub-title {
         text-align: center;
+        color: #94a3b8;
+        font-size: 18px;
+        font-weight: 300;
+        margin-bottom: 2rem;
     }
 
-    h3 {
-        font-size: 24px !important;
-        color: #334155 !important;
-        margin-bottom: 15px !important;
+    /* หัวข้อภายในแอป */
+    h1, h2, h3 {
+        font-weight: 600 !important;
+        color: #f1f5f9 !important;
+        letter-spacing: -0.5px;
+        border-radius: 0px !important;
     }
 
-    /* ปรับแต่ง Tabs */
+    /* ปรับแต่ง Tabs ให้เป็นเหลี่ยม */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 24px;
+        gap: 0px;
+        background-color: #1f2937;
+        border: 1px solid #374151;
     }
 
     .stTabs [data-baseweb="tab"] {
-        font-size: 18px;
-        color: #64748b;
+        height: 50px;
+        background-color: transparent;
+        border-radius: 0px;
+        color: #94a3b8;
+        font-weight: 500;
+        border-right: 1px solid #374151;
+        padding: 0 30px;
     }
 
-    [data-testid="stDataFrame"] {
-        border-radius: 20px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    /* Tab ที่เลือก */
+    .stTabs [aria-selected="true"] {
+        background-color: #374151;
+        color: #f8fafc !important;
+        border-bottom: 2px solid #60a5fa !important;
+    }
+
+    /* ปรับแต่ง DataFrame และ Table ให้ขอบคม */
+    [data-testid="stDataFrame"], .styled-table, table {
+        border-radius: 0px !important;
+        border: 1px solid #374151 !important;
+        background-color: #1f2937;
+    }
+
+    /* ปรับแต่งสี Alert/Status */
+    .stAlert {
+        border-radius: 0px;
+        background-color: #1f2937;
+        border: 1px solid #374151;
+    }
+    
+    /* สีทองหม่นสำหรับ Success */
+    .stAlert:has(div[class*="st-b"]) {
+        border-color: #eab308;
+        color: #eab308;
+    }
+    
+    /* สีฟ้าสำหรับ Info */
+    .stAlert:has(div[class*="st-c"]) {
+        border-color: #3b82f6;
+        color: #3b82f6;
+    }
+
+    /* ปรับแต่ง File Uploader */
+    .stFileUploader section {
+        background-color: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 0px;
     }
     </style>
 """, unsafe_allow_html=True)
 
+# 管理 Session State
 if "current_app" not in st.session_state:
     st.session_state.current_app = "Main Menu"
 
+# ฟังก์ชันกลับหน้าหลัก
 def go_to_menu():
     for key in list(st.session_state.keys()):
         if key not in ["current_app", "reset_counter", "uploader_key"]:
@@ -116,31 +167,24 @@ def go_to_menu():
     st.rerun()
 
 # ==========================================
-# APP 1: FILE VALIDATOR (FIXED RESET MODEL)
+# APP 1: FILE VALIDATOR
 # ==========================================
 def app_file_validator():
-    st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📁 File Validator</h1>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>ตรวจสอบ format ไฟล์ QPM ก่อนส่ง ✨</p>", unsafe_allow_html=True)
-    
-    # ดึง reset_counter มาใช้ควบคุม widget
-    if 'reset_counter' not in st.session_state:
-        st.session_state.reset_counter = 0
+    st.markdown("<h2 style='text-align: center; border-bottom: 2px solid #374151; padding-bottom: 15px;'>📁 File Validator</h2>", unsafe_allow_html=True)
     
     with st.sidebar:
-        st.markdown("### 🧭 Control Panel")
-        if st.button("🏠 Home Menu", use_container_width=True):
+        st.markdown("### 🛠️ Control Panel")
+        if st.button("⬅️ Back to Menu"):
             go_to_menu()
-        
-        # ปรับปรุงปุ่ม Refresh ให้ล้างค่าโมเดลด้วย
-        if st.button("🔄 Refresh System", use_container_width=True):
-            # ลบค่าผลลัพธ์เดิมออก
+        st.divider()
+        if st.button("🔄 Reset This App"):
             for key in list(st.session_state.keys()):
-                if key not in ["current_app", "reset_counter", "uploader_key"]:
-                    del st.session_state[key]
-            
-            # เพิ่ม counter เพื่อเปลี่ยน Key ของ Selectbox ทำให้มันกลับไปค่าเริ่มต้น
-            st.session_state.reset_counter += 1
+                if key != "current_app": del st.session_state[key]
+            st.session_state.reset_counter = st.session_state.get('reset_counter', 0) + 1
             st.rerun()
+
+    if 'reset_counter' not in st.session_state:
+        st.session_state.reset_counter = 0
 
     TARGET_SHEET = "RAMP v1.3"
 
@@ -157,30 +201,22 @@ def app_file_validator():
 
     try:
         available_models = get_available_models()
-        model_list = ["-- เลือกโมเดลอ้างอิง --"] + sorted(list(available_models.keys()))
+        model_list = ["-- Please Select Model --"] + sorted(list(available_models.keys()))
         
-        c1, c2 = st.columns(2)
-        with c1:
-            # ใช้ key ที่ผูกกับ reset_counter เพื่อให้ Reset ค่าได้จริง
-            selected_model_name = st.selectbox(
-                "📍 Reference Model", 
-                model_list, 
-                index=0, 
-                key=f"model_selector_{st.session_state.reset_counter}"
-            )
+        # จัดระเบียบ Layout การเลือกไฟล์
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.markdown("#### 1. เลือกโมเดลอ้างอิง")
+            selected_model_name = st.selectbox("Select Model", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}", label_visibility="collapsed")
         
-        if selected_model_name != "-- เลือกโมเดลอ้างอิง --":
-            with c2:
-                # ใช้ key ผูกกับ reset_counter เช่นกัน
-                uploaded_file = st.file_uploader(
-                    "📥 อัปโหลดไฟล์ที่ต้องการตรวจ", 
-                    type=["xlsx", "xlsm"], 
-                    key=f"file_v_{st.session_state.reset_counter}"
-                )
+        if selected_model_name != "-- Please Select Model --":
+            with col2:
+                st.markdown("#### 2. อัปโหลดไฟล์ที่ต้องการตรวจ")
+                uploaded_file = st.file_uploader("Upload", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}", label_visibility="collapsed")
 
             if uploaded_file:
-                st.write("---")
-                with st.status("🔍 กำลังตรวจสอบความถูกต้องของไฟล์...", expanded=True) as status:
+                st.divider()
+                with st.spinner('กำลังตรวจสอบความถูกต้อง...'):
                     wb = load_workbook(uploaded_file, data_only=False)
                     ws = wb[TARGET_SHEET]
                     df_ref = pd.read_excel(available_models[selected_model_name], sheet_name=TARGET_SHEET, header=None).fillna("")
@@ -188,278 +224,220 @@ def app_file_validator():
                     
                     f_errors, missing_data, extra_data, d_errors, k_errors = [], {}, {}, [], []
 
+                    # 1. ตรวจ Par no./ Drawing no. (ช่อง F3/F5)
                     for r, c, label in [(2, 5, "F3"), (4, 5, "F5")]:
                         if str(df_user.iloc[r, c]).strip() != str(df_ref.iloc[r, c]).strip():
                             f_errors.append({"Position": label, "Found": df_user.iloc[r, c], "Target": df_ref.iloc[r, c]})
 
+                    # 2. ตรวจ Missing/Extra Data ในตารางหลัก
                     for r in range(76):
                         for c in range(df_ref.shape[1]):
+                            # ยกเว้นคอลัมน์ D และ K ที่เป็นสูตร/วันที่
                             if r >= 12 and c in [3, 10]: continue
-                            ref_v, user_v = str(df_ref.iloc[r, c]).strip(), str(df_user.iloc[r, c]).strip()
+                            
+                            ref_v = str(df_ref.iloc[r, c]).strip()
+                            user_v = str(df_user.iloc[r, c]).strip()
+                            
+                            # ถ้าต้นฉบับมี แต่ไฟล์แนบไม่มี -> Missing
                             if ref_v != "" and (user_v == "" or user_v == "nan"):
                                 missing_data.setdefault(get_column_letter(c), []).append(str(r+1))
+                            # ถ้าต้นฉบับว่าง แต่ไฟล์แนบมี (ยกเว้นแถว 12) -> Extra
                             elif ref_v == "" and (user_v != "" and user_v != "nan") and r+1 != 12:
                                 extra_data.setdefault(get_column_letter(c), []).append(str(r+1))
 
+                    # 3. ตรวจรูปแบบวันที่และเวลาคอลัมน์ D และ K
                     for row_idx in range(13, 77): 
                         for col_idx, (col_label, error_list) in enumerate(zip(['D', 'K'], [d_errors, k_errors])):
                             target_col = 4 if col_label == 'D' else 11
                             cell = ws.cell(row=row_idx, column=target_col)
-                            if cell.value is not None:
-                                val, fmt = cell.value, str(cell.number_format).lower()
-                                has_format = (('y' in fmt or ('d' in fmt and 'm' in fmt)) and 'h' in fmt)
-                                is_valid_data = False
-                                if isinstance(val, (datetime.datetime, datetime.date)):
-                                    is_valid_data = True
-                                else:
-                                    try:
-                                        dt_temp = pd.to_datetime(val)
-                                        is_valid_data = False if (dt_temp.hour == 0 and dt_temp.minute == 0 and dt_temp.second == 0) else True
-                                    except: is_valid_data = False
-
-                                if not has_format or not is_valid_data:
-                                    reason = "❌ Format ผิด" if not has_format else "❌ ขาดเวลา"
-                                    error_list.append({"Row": row_idx, "Value": str(val), "Status": reason})
-                    status.update(label="ตรวจสอบเสร็จเรียบร้อย!", state="complete", expanded=False)
-
-                if not (f_errors or missing_data or extra_data or d_errors or k_errors):
-                    st.balloons()
-                    st.success("✨ ยินดีด้วย! ข้อมูลถูกต้องสมบูรณ์ 100%")
-                else:
-                    if f_errors:
-                        st.error("⚠️ part no. / drawing no. ไม่ถูกต้อง (ช่อง F3/F5)")
-                        st.table(pd.DataFrame(f_errors))
-
-                    col_mis, col_ext = st.columns(2)
-                    with col_mis:
-                        if missing_data:
-                            st.warning("📉 ข้อมูลที่หายไป (Missing Data)")
-                            st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
-                    with col_ext:
-                        if extra_data:
-                            st.warning("🚫 ข้อมูลส่วนเกิน (Extra Data)")
-                            st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
-
-                    col_d, col_k = st.columns(2)
-                    with col_d:
-                        if d_errors:
-                            st.error("🔍 ปัญหาที่คอลัมน์ Washing Date (D)")
-                            st.dataframe(pd.DataFrame(d_errors), use_container_width=True, hide_index=True)
-                    with col_k:
-                        if k_errors:
-                            st.error("🔍 ปัญหาที่คอลัมน์ Finish Date (K)")
-                            st.dataframe(pd.DataFrame(k_errors), use_container_width=True, hide_index=True)
                             
-    except Exception as e: st.error(f"เกิดข้อผิดพลาด: {e}")
-        
+                            if cell.value is not None:
+                                # ตรวจสอบรูปแบบวันที่และเวลาผ่าน number_format
+                                fmt = str(cell.number_format).lower()
+                                # ต้องมีอย่างน้อย y (ปี) หรือ d (วัน) m (เดือน) และ h (ชั่วโมง)
+                                has_date = ('y' in fmt) or ('d' in fmt and 'm' in fmt)
+                                has_time = ('h' in fmt)
+                                
+                                if not (has_date and has_time):
+                                    error_list.append({"Row": row_idx, "Format": fmt, "Status": "❌ รูปแบบผิด (ต้องมีทั้งวันที่และเวลา)"})
+
+                st.markdown("### 📋 ผลการตรวจสอบ")
+                # หากไม่พบข้อผิดพลาดเลย
+                if not (f_errors or missing_data or extra_data or d_errors or k_errors):
+                    st.success("✅ ยอดเยี่ยม! ข้อมูลและรูปแบบถูกต้องทั้งหมด")
+                else:
+                    # แสดงข้อผิดพลาดตามหมวดหมู่
+                    if f_errors: st.warning("⚠️ Par no. / Drawing no. ไม่ถูก (ช่อง F3/F5)"); st.table(pd.DataFrame(f_errors))
+                    if missing_data: st.info("⚠️ พบข้อมูลที่หายไป (Missing Data)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
+                    if extra_data: st.error("🚫 พบข้อมูลเกินมาในช่องที่ควรว่าง (Extra Data)"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+                    
+                    res_c1, res_c2 = st.columns(2)
+                    with res_c1:
+                        st.markdown("🔍 **ตรวจสอบคอลัมน์ D (Washing Date)**")
+                        if d_errors: st.dataframe(pd.DataFrame(d_errors), use_container_width=True)
+                        else: st.write("✅ ปกติ")
+                    with res_c2:
+                        st.markdown("🔍 **ตรวจสอบคอลัมน์ K (Finish Date)**")
+                        if k_errors: st.dataframe(pd.DataFrame(k_errors), use_container_width=True)
+                        else: st.write("✅ ปกติ")
+    except Exception as e: st.error(f"Error: {e}")
+
 # ==========================================
-# APP 2: WASHING DATE PROCESSOR (ORIGINAL LOGIC + SIDEBAR RESET)
+# APP 2: WASHING DATE PROCESSOR
 # ==========================================
 def app_washing_processor():
-    # ส่วนหัวและคำอธิบาย (UI ใหม่)
-    st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>ตรวจสอบวันล้างจาก lot no. ⚡</p>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; border-bottom: 2px solid #374151; padding-bottom: 15px;'>📊 Washing Date Processor</h2>", unsafe_allow_html=True)
     
-    # ==========================================
-    # 🧭 SIDEBAR (CONTROL PANEL)
-    # ==========================================
     with st.sidebar:
-        st.markdown("### 🧭 Control Panel")
-        
-        # ปุ่มกลับหน้าหลัก
-        if st.button("🏠 Home Menu", use_container_width=True):
+        st.markdown("### 🛠️ Control Panel")
+        if st.button("⬅️ Back to Menu"):
             go_to_menu()
-            
-        # ย้ายปุ่ม Reset มาไว้ที่นี่ตามคำขอ
-        if st.button("🔄 Refresh System", use_container_width=True):
+        st.divider()
+        if st.button("🔄 Reset This App"):
+            # ล้างผลลัพธ์ใน session state
             st.session_state.output = None
             st.session_state.summary = None
             st.session_state.file = None
+            # เปลี่ยน uploader_key เพื่อล้างไฟล์ที่อัปโหลดค้างไว้
             st.session_state.uploader_key = st.session_state.get('uploader_key', 0) + 1
             st.rerun()
 
-    # =========================
-    # SESSION STATE
-    # =========================
     if "uploader_key" not in st.session_state:
         st.session_state.uploader_key = 0
 
-    # =========================
-    # UPLOAD UI (Layout สองคอลัมน์)
-    # =========================
     col_u1, col_u2 = st.columns(2)
     with col_u1:
         file1 = st.file_uploader("📂 Upload File 1 (Lot/Serial)", type=["xls", "xlsx", "csv"], key=f"file1_{st.session_state.uploader_key}")
     with col_u2:
-        file2 = st.file_uploader("📂 Upload File 2 (Runcard / Barcode)", type=["xls", "xlsx", "csv"], key=f"file2_{st.session_state.uploader_key}")
+        file2 = st.file_uploader("📂 Upload File 2 (Barcode)", type=["xls", "xlsx", "csv"], key=f"file2_{st.session_state.uploader_key}")
 
-    # ==========================================
-    # INTERNAL FUNCTIONS (YOUR ORIGINAL LOGIC)
-    # ==========================================
     def read_excel(file):
         try: return pd.read_excel(file, engine="openpyxl", header=None)
         except: return pd.read_excel(file, engine="xlrd", header=None)
 
+    # ฟังก์ชันอ่านไฟล์ 1 (Lot List)
     def read_file1(file):
         df = read_excel(file)
-        col = 5
-        start_row = 16
-        data = df.iloc[start_row:, col]
+        # อ่านคอลัมน์ F (index 5) ตั้งแต่แถวที่ 17 (index 16)
+        data = df.iloc[16:, 5]
         lot_list = []
         for val in data:
-            if pd.isna(val): break
-            val_str = str(val).strip()
-            if val_str == "": break
-            lot_list.append(val_str)
+            if pd.isna(val) or str(val).strip() == "": break # หยุดอ่านเมื่อเจอช่องว่าง
+            lot_list.append(str(val).strip())
         return pd.DataFrame({"Lot": lot_list})
 
+    # ฟังก์ชันอ่านไฟล์ 2 (Barcode Data)
     def read_file2(file):
         df = read_excel(file)
-        header_row = None
-        for i in range(20):
-            row = df.iloc[i].astype(str).str.lower()
-            if row.str.contains("runcard").any() and row.str.contains("barcode").any():
-                header_row = i
-                break
+        header_row = next((i for i in range(20) if df.iloc[i].astype(str).str.lower().str.contains("runcard").any()), None)
         if header_row is None:
-            st.error("❌ หา header ไม่เจอ (Runcard / Barcode)")
-            return pd.DataFrame()
-            
+            return None
         df.columns = df.iloc[header_row]
-        df = df[header_row + 1:]
+        df = df[header_row + 1:].copy()
         df.columns = df.columns.astype(str).str.strip().str.lower()
         
-        lot_cols = [c for c in df.columns if "runcard" in str(c).lower()]
-        barcode_cols = [c for c in df.columns if "barcode" in str(c).lower()]
+        lot_col = [c for c in df.columns if "runcard" in c][0]
+        barcode_col = [c for c in df.columns if "barcode" in c][0]
+        packed_col = [c for c in df.columns if "packed" in c and "date" in c][0]
         
-        if len(lot_cols) == 0 or len(barcode_cols) == 0:
-            st.error(f"❌ หา column ไม่เจอ\nColumns ที่มี: {list(df.columns)}")
-            return pd.DataFrame()
-        
-        packed_col = None
-        for c in df.columns:
-            if "packed" in str(c).lower() and "date" in str(c).lower():
-                packed_col = c
-                break
-        if packed_col is None:
-            st.error("❌ หา Q4 Packed Date ไม่เจอ")
-            return pd.DataFrame()
-            
-        df_out = df[[lot_cols[0], barcode_cols[0], packed_col]].copy()
+        df_out = df[[lot_col, barcode_col, packed_col]].dropna(subset=[lot_col])
         df_out.columns = ["Lot", "Barcode No", "Packed Date"]
-        df_out = df_out.dropna(subset=["Lot"])
-        df_out["Lot"] = df_out["Lot"].astype(str).str.strip()
         df_out["Packed Date"] = pd.to_datetime(df_out["Packed Date"], errors="coerce")
         return df_out
 
-    def extract_ww_day(barcode):
-        try:
-            s = str(barcode)
-            match = re.search('[A-Za-z]', s)
-            if not match: return None, None
-            start = match.start()
-            code = s[start+3:start+6]
-            if len(code) != 3 or not code.isdigit(): return None, None
-            return int(code[:2]), int(code[2])
-        except: return None, None
-
-    def find_best_date(row, date_db):
-        if pd.isna(row["WW"]) or pd.isna(row["Day"]) or pd.isna(row["Packed Date"]): return None
-        candidates = date_db[(date_db["WW"] == row["WW"]) & (date_db["Day"] == row["Day"])].copy()
-        if candidates.empty: return None
-        candidates["diff"] = (candidates["Date"] - row["Packed Date"]).abs()
-        return candidates.sort_values("diff").iloc[0]["Date"]
-
-    # =========================
-    # PROCESS EXECUTION
-    # =========================
-    if st.button("🚀 PROCESS DATA", use_container_width=True):
-        if file1 is None or file2 is None:
+    if st.button("🚀 ประมวลผลข้อมูล", use_container_width=True):
+        if not file1 or not file2:
             st.warning("⚠️ กรุณาอัปโหลดไฟล์ให้ครบทั้ง 2 ช่อง")
         else:
-            with st.spinner('กำลังประมวลผลตามขั้นตอน...'):
+            with st.spinner('กำลังคำนวณ...'):
                 df1 = read_file1(file1)
                 df2 = read_file2(file2)
                 
-                if not df2.empty:
+                if df2 is not None:
+                    # จับคู่ข้อมูล
                     merged = pd.merge(df1, df2, on="Lot", how="left").drop_duplicates(subset=["Lot"])
-                    merged[['WW', 'Day']] = merged['Barcode No'].apply(lambda x: pd.Series(extract_ww_day(x)))
                     
-                    merged["WW"] = pd.to_numeric(merged["WW"], errors="coerce")
-                    merged["Day"] = pd.to_numeric(merged["Day"], errors="coerce")
+                    # ดึง WW และ Day
+                    def ext_ww(b):
+                        m = re.search('[A-Za-z]', str(b))
+                        if not m: return None, None
+                        c = str(b)[m.start()+3:m.start()+6]
+                        return (int(c[:2]), int(c[2])) if (len(c)==3 and c.isdigit()) else (None, None)
                     
-                    # โหลด database.txt
+                    merged[['WW', 'Day']] = merged['Barcode No'].apply(lambda x: pd.Series(ext_ww(x)))
+                    
+                    # โหลด Database
                     date_db = pd.read_csv("database.txt")
                     date_db["Date"] = pd.to_datetime(date_db["Date"], format="%d-%b-%Y", errors="coerce")
-                    date_db["WW"] = pd.to_numeric(date_db["WW"], errors="coerce")
-                    date_db["Day"] = pd.to_numeric(date_db["Day"], errors="coerce")
                     
-                    merged["Washing Date Raw"] = merged.apply(lambda row: find_best_date(row, date_db), axis=1)
-                    
-                    output = merged[["Lot", "Barcode No", "WW", "Day", "Washing Date Raw"]].copy()
-                    output["Washing Date"] = pd.to_datetime(output["Washing Date Raw"]).dt.strftime("%d-%b-%Y")
-                    output = output[output["Lot"].astype(str).str.lower() != "lot/serial"].reset_index(drop=True)
-                    
-                    summary = output.groupby("Washing Date")["Lot"].count().reset_index().rename(columns={"Lot": "Total Lot"})
-                    
-                    buffer = io.BytesIO()
-                    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
-                        output.drop(columns=["Washing Date Raw"]).to_excel(writer, index=False, sheet_name="Result")
-                        summary.to_excel(writer, index=False, sheet_name="Summary")
-                    
-                    st.session_state.output = output.drop(columns=["Washing Date Raw"])
-                    st.session_state.summary = summary
-                    st.session_state.file = buffer.getvalue()
+                    # เทียบ WW/Day เพื่อหาวันที่ล้างสินค้า
+                    def find_d(r, d_db):
+                        if pd.isna(r["WW"]) or pd.isna(r["Day"]) or pd.isna(r["Packed Date"]): return None
+                        c = d_db[(d_db["WW"] == r["WW"]) & (d_db["Day"] == r["Day"])].copy()
+                        if c.empty: return None
+                        c["diff"] = (c["Date"] - r["Packed Date"]).abs()
+                        return c.sort_values("diff").iloc[0]["Date"]
 
-    # =========================
-    # DISPLAY RESULTS
-    # =========================
+                    merged["Washing Date"] = merged.apply(lambda r: find_d(r, date_db), axis=1)
+                    
+                    # เตรียมผลลัพธ์
+                    out = merged[["Lot", "Barcode No", "WW", "Day", "Washing Date"]].copy()
+                    out["Washing Date"] = pd.to_datetime(out["Washing Date"]).dt.strftime("%d-%b-%Y")
+                    sum_df = out.groupby("Washing Date")["Lot"].count().reset_index().rename(columns={"Lot": "Total Lot"})
+                    
+                    # บันทึกลง Buffer เพื่อรอการดาวน์โหลด
+                    buf = io.BytesIO()
+                    with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+                        out.to_excel(writer, index=False, sheet_name="Result")
+                        sum_df.to_excel(writer, index=False, sheet_name="Summary")
+                    
+                    st.session_state.output, st.session_state.summary, st.session_state.file = out, sum_df, buf.getvalue()
+
     if st.session_state.get("output") is not None:
-        st.success("✅ Process สำเร็จ!")
-        tab1, tab2 = st.tabs(["📋 Result Detail", "📊 Summary View"])
+        st.success("✅ ประมวลผลสำเร็จ!")
+        tab1, tab2 = st.tabs(["📄 รายละเอียดข้อมูล", "📊 สรุปผล"])
+        with tab1: st.dataframe(st.session_state.output, use_container_width=True)
+        with tab2: st.dataframe(st.session_state.summary, use_container_width=True)
         
-        with tab1:
-            st.dataframe(st.session_state.output, use_container_width=True)
-        with tab2:
-            st.dataframe(st.session_state.summary, use_container_width=True)
-            
         st.download_button(
-            label="📥 DOWNLOAD EXCEL RESULT",
+            label="📥 ดาวน์โหลดไฟล์ Excel (Result)",
             data=st.session_state.file,
-            file_name="washing_date_result.xlsx",
+            file_name=f"result_{datetime.datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             use_container_width=True
         )
+
 # ==========================================
-# MAIN ROUTING - UPDATED FOR PERFECT CENTERING
+# MAIN ROUTING
 # ==========================================
+# หน้าเมนูหลัก
 if st.session_state.current_app == "Main Menu":
-    st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
-    # ปรับหัวข้อให้ใหญ่และเปลี่ยนสไตล์ฟอนต์ตามคำขอ
-    st.markdown("<p class='main-title'></p>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #475569; font-size: 40px; font-weight: 500;'>📂 QAD Support Application 🚀</p>", unsafe_allow_html=True)
-    st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
+    st.markdown("<p class='main-title'>QAD System Hub</p>", unsafe_allow_html=True)
+    st.markdown("<p class='sub-title'>QAD Support Application</p>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
-    # ดึงปุ่มมาตรงกลางหน้าจอ (Layout เดิม)
-    _, col_main, _ = st.columns([0.15, 0.7, 0.15])
+    # วางปุ่มใน Layout ที่สมดุล
+    empty_col_left, c1, col_gap, c2, empty_col_right = st.columns([1, 4, 0.5, 4, 1])
     
-    with col_main:
-        c1, c2 = st.columns(2, gap="large")
-        
-        with c1:
-            st.markdown("### 📋 ตรวจเช็ค Format ไฟล์ QPM")
-            st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
-            if st.button("📁 File Validator"):
-                st.session_state.current_app = "Validator"; st.rerun()
+    with c1:
+        st.markdown("### ตรวจสอบ format ไฟล์ก่อนส่ง")
+        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+        if st.button("📁 File Validator"):
+            st.session_state.current_app = "Validator"
+            st.rerun()
 
-        with c2:
-            st.markdown("### 🧼 ตรวจวันล้างงาน")
-            st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
-            if st.button("📊 Washing Date Processor"):
-                st.session_state.current_app = "Processor"; st.rerun()
+    with c2:
+        st.markdown("### ตรวจสอบวันล้าง")
+        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+        if st.button("📊 Washing Date Processor"):
+            st.session_state.current_app = "Processor"
+            st.rerun()
 
-    st.markdown("<div style='height: 120px;'></div>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #94a3b8; font-size: 14px;'>© 2026 Quality Engineering | Systems v2.0 ✨</p>", unsafe_allow_html=True)
+# หน้าแอป File Validator
+elif st.session_state.current_app == "Validator":
+    app_file_validator()
 
-elif st.session_state.current_app == "Validator": app_file_validator()
-elif st.session_state.current_app == "Processor": app_washing_processor()
+# หน้าแอป Washing Date Processor
+elif st.session_state.current_app == "Processor":
+    app_washing_processor()
