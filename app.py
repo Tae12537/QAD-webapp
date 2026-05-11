@@ -9,7 +9,7 @@ from openpyxl import load_workbook
 # ==========================================
 # 💎 PREMIER LUXURY UI SETTINGS
 # ==========================================
-st.set_page_config(page_title="QAD System Hub", layout="wide")
+st.set_page_config(page_title="", layout="wide")
 
 st.markdown("""
     <style>
@@ -319,7 +319,7 @@ def app_washing_processor():
 if st.session_state.current_app == "Main Menu":
     st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
     st.markdown("<p class='main-title'>QAD System Hub</p>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px; font-weight: 300;'>QAD Support Application</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #64748b; font-size: 30px; font-weight: 400;'>QAD Support Application</p>", unsafe_allow_html=True)
     st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     
     # ใช้ 3 คอลัมน์โดยให้คอลัมน์กลางกว้างที่สุดเพื่อดึงเข้าหาศูนย์กลาง
