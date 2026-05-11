@@ -453,7 +453,7 @@ if st.session_state.current_app == "Main Menu":
                 st.session_state.current_app = "Validator"; st.rerun()
 
         with c2:
-            st.markdown("### 🧼 ตรวจวันล้างสินค้า")
+            st.markdown("### 🧼 ตรวจวันล้างงาน")
             st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
             if st.button("📊 Washing Date Processor"):
                 st.session_state.current_app = "Processor"; st.rerun()
