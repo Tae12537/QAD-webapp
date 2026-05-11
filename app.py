@@ -154,7 +154,7 @@ def app_file_validator():
                                     is_valid_data = False
 
                             if not has_format or not is_valid_data:
-                                reason = "❌ Format ผิด" if not has_format else "❌ ข้อมูลเป็นข้อความ (กรุณา Double Click หรือใช้ Text to Columns)"
+                                reason = "❌ Format ผิด" if not has_format else "❌ ขาดเวลา"
                                 error_list.append({"Row": row_idx, "Value": str(val), "Status": reason})
 
                 st.markdown("### 📋 Result")
