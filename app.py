@@ -120,7 +120,7 @@ def go_to_menu():
 # ==========================================
 def app_file_validator():
     st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📁 File Validator</h1>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>ตรวจสอบ format ไฟล์ก่อนส่ง ✨</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>ตรวจสอบ format ไฟล์ QPM ก่อนส่ง ✨</p>", unsafe_allow_html=True)
     
     # ดึง reset_counter มาใช้ควบคุม widget
     if 'reset_counter' not in st.session_state:
