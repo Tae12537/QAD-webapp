@@ -318,7 +318,7 @@ def app_washing_processor():
 # ==========================================
 if st.session_state.current_app == "Main Menu":
     st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
-    st.markdown("<p class='main-title'>QAD</p>", unsafe_allow_html=True)
+    st.markdown("<p class='main-title'></p>", unsafe_allow_html=True)
     st.markdown("<p class='center-text' style='color: #64748b; font-size: 30px; font-weight: 400;'>QAD Support Application</p>", unsafe_allow_html=True)
     st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     
@@ -341,7 +341,7 @@ if st.session_state.current_app == "Main Menu":
                 st.session_state.current_app = "Processor"; st.rerun()
 
     st.markdown("<div style='height: 120px;'></div>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #cbd5e1; font-size: 12px;'>© 2026 QAD Engineering | System Excellence v2.5</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #cbd5e1; font-size: 12px;'>© 2026 QE | System Excellence v2.5</p>", unsafe_allow_html=True)
 
 elif st.session_state.current_app == "Validator": app_file_validator()
 elif st.session_state.current_app == "Processor": app_washing_processor()
