@@ -253,7 +253,7 @@ def app_washing_processor():
             go_to_menu()
             
         # ย้ายปุ่ม Reset มาไว้ที่นี่ตามคำขอ
-        if st.button("🔄 Reset / Clear Data", use_container_width=True):
+        if st.button("🔄 Refresh System", use_container_width=True):
             st.session_state.output = None
             st.session_state.summary = None
             st.session_state.file = None
