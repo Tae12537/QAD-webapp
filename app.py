@@ -28,56 +28,78 @@ st.markdown("""
         border-right: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* ปุ่มเมนูหลักสไตล์ Premium - แก้ไขให้กึ่งกลางเป๊ะ */
+    div.block-container {
+        padding-top: 2rem;
+    }
+
+    /* ปุ่มเมนูหลักสไตล์ Premium - บังคับให้อยู่กลาง */
     div.stButton > button:first-child {
         background: #ffffff;
-        color: #1e293b;
+        color: #0f172a;
         border: 1px solid #e2e8f0;
-        border-radius: 30px;
-        height: 140px;
+        border-radius: 24px;
+        height: 120px;
         width: 100%;
-        font-size: 26px;
+        font-size: 24px;
         font-weight: 700;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 20px;
-        line-height: 1.2;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     div.stButton > button:hover {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        background: #1e3a8a;
         color: #ffffff;
-        border-color: transparent;
-        transform: scale(1.05);
-        box-shadow: 0 20px 25px -5px rgba(30, 58, 138, 0.2);
+        border-color: #1e3a8a;
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(30, 58, 138, 0.25);
     }
 
     /* ชื่อแอปหลัก */
     .main-title {
-        font-size: 72px;
-        font-weight: 800;
-        background: linear-gradient(to right, #0f172a, #1e3a8a, #3b82f6);
+        font-size: 64px;
+        font-weight: 700;
+        background: linear-gradient(to right, #1e3a8a, #3b82f6);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: -10px;
+        margin-bottom: 0px;
         text-align: center;
-        letter-spacing: -2px;
     }
 
-    /* จัดระเบียบหัวข้อ */
-    .sub-header-text {
-        text-align: center; 
-        margin-bottom: 30px; 
-        font-weight: 600; 
-        color: #1e3a8a;
-        font-size: 1.2rem;
+    .center-text {
+        text-align: center;
     }
 
-    /* Style สำหรับ Dataframe */
+    h1, h2, h3 {
+        font-weight: 600 !important;
+        color: #1e293b !important;
+        letter-spacing: -0.5px;
+        text-align: center !important;
+    }
+
+    /* ปรับแต่ง Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 24px;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        white-space: pre;
+        background-color: transparent;
+        border-radius: 8px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .stTabs [aria-selected="true"] {
+        color: #1e3a8a !important;
+        border-bottom-color: #1e3a8a !important;
+    }
+
     [data-testid="stDataFrame"] {
         border-radius: 16px;
         overflow: hidden;
@@ -100,8 +122,8 @@ def go_to_menu():
 # APP 1: FILE VALIDATOR
 # ==========================================
 def app_file_validator():
-    st.markdown("<h1 style='text-align: center; color: #1e3a8a;'>📁 File Validator</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b;'>ตรวจสอบ format ไฟล์ก่อนส่ง</p>", unsafe_allow_html=True)
+    st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📁 File Validator</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #64748b;'>ตรวจสอบ format ไฟล์ก่อนส่ง</p>", unsafe_allow_html=True)
     
     with st.sidebar:
         st.markdown("### 🧭 Control Panel")
@@ -186,12 +208,13 @@ def app_file_validator():
                     status.update(label="Checking Complete!", state="complete", expanded=False)
 
                 if not (f_errors or missing_data or extra_data or d_errors or k_errors):
-                    st.balloons(); st.success("✨ ข้อมูลถูกต้องสมบูรณ์ 100%")
+                    st.balloons()
+                    st.success("✨ ข้อมูลถูกต้องสมบูรณ์ 100%")
                 else:
                     if f_errors:
                         st.error("⚠️ หัวตารางไม่ตรง (F3/F5)")
                         st.table(pd.DataFrame(f_errors))
-                    
+
                     col_mis, col_ext = st.columns(2)
                     with col_mis:
                         if missing_data:
@@ -218,8 +241,8 @@ def app_file_validator():
 # APP 2: WASHING DATE PROCESSOR
 # ==========================================
 def app_washing_processor():
-    st.markdown("<h1 style='text-align: center; color: #1e3a8a;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b;'>ตรวจสอบวันล้าง</p>", unsafe_allow_html=True)
+    st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #64748b;'>ตรวจสอบวันล้าง</p>", unsafe_allow_html=True)
     
     with st.sidebar:
         st.markdown("### 🧭 Control Panel")
@@ -291,31 +314,34 @@ def app_washing_processor():
         st.download_button("📥 DOWNLOAD RESULT (.XLSX)", st.session_state.file, f"Result_{datetime.datetime.now().strftime('%H%M')}.xlsx", use_container_width=True)
 
 # ==========================================
-# MAIN ROUTING
+# MAIN ROUTING - UPDATED FOR PERFECT CENTERING
 # ==========================================
 if st.session_state.current_app == "Main Menu":
-    st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
-    st.markdown("<p class='main-title'>QAD System Hub</p>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b; font-size: 22px; font-weight: 300; letter-spacing: 1px;'>QAD Support Application</p>", unsafe_allow_html=True)
     st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
+    st.markdown("<p class='main-title'>QAD System Hub</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px; font-weight: 300;'>QAD Support Application</p>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     
-    # จัด Layout ให้ปุ่มอยู่กลางหน้าจอ
-    _, col1, gap, col2, _ = st.columns([0.5, 2, 0.2, 2, 0.5])
+    # ใช้ 3 คอลัมน์โดยให้คอลัมน์กลางกว้างที่สุดเพื่อดึงเข้าหาศูนย์กลาง
+    _, col_main, _ = st.columns([0.15, 0.7, 0.15])
     
-    with col1:
-        st.markdown("<p class='sub-header-text'>📁 Data Integrity</p>", unsafe_allow_html=True)
-        if st.button("FILE\nVALIDATOR"):
-            st.session_state.current_app = "Validator"
-            st.rerun()
+    with col_main:
+        c1, c2 = st.columns(2, gap="large")
+        
+        with c1:
+            st.markdown("### ตรวจสอบ format ไฟล์ก่อนส่ง")
+            st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+            if st.button("📁 File Validator"):
+                st.session_state.current_app = "Validator"; st.rerun()
 
-    with col2:
-        st.markdown("<p class='sub-header-text'>📊 Efficiency Boost</p>", unsafe_allow_html=True)
-        if st.button("WASHING DATE\nPROCESSOR"):
-            st.session_state.current_app = "Processor"
-            st.rerun()
+        with c2:
+            st.markdown("### ตรวจสอบวันล้าง")
+            st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+            if st.button("📊 Washing Date Processor"):
+                st.session_state.current_app = "Processor"; st.rerun()
 
     st.markdown("<div style='height: 120px;'></div>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #cbd5e1; font-size: 13px; letter-spacing: 2px;'>© 2026 QAD ENGINEERING | EXCELLENCE THROUGH DATA</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #cbd5e1; font-size: 12px;'>© 2026 QAD Engineering | System Excellence v2.5</p>", unsafe_allow_html=True)
 
 elif st.session_state.current_app == "Validator": app_file_validator()
 elif st.session_state.current_app == "Processor": app_washing_processor()
