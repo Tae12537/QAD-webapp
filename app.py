@@ -317,7 +317,7 @@ if st.session_state.current_app == "Main Menu":
     st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     # ปรับหัวข้อให้ใหญ่และเปลี่ยนสไตล์ฟอนต์ตามคำขอ
     st.markdown("<p class='main-title'>📂 QAD Support Hub 🚀</p>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #475569; font-size: 28px; font-weight: 500;'></p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #475569; font-size: 28px; font-weight: 500;'>ยินดีต้อนรับสู่ระบบช่วยเหลือวิศวกรรม</p>", unsafe_allow_html=True)
     st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     
     # ดึงปุ่มมาตรงกลางหน้าจอ (Layout เดิม)
