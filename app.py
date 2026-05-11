@@ -228,7 +228,7 @@ def app_file_validator():
 # ==========================================
 def app_washing_processor():
     st.markdown("<h1 style='text-align: center; color: #1e3a8a;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b;'>จับคู่ Lot และคำนวณวันที่ล้างแบบอัตโนมัติ</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b;'>ตรวจสอบวันล้าง</p>", unsafe_allow_html=True)
     
     with st.sidebar:
         st.markdown("### 🧭 Control Panel")
