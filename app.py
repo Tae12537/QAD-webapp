@@ -240,7 +240,7 @@ def app_file_validator():
 def app_washing_processor():
     # ส่วนหัวและคำอธิบาย (UI ใหม่)
     st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>คำนวณวันล้างสินค้าด้วย Logic เดิมที่คุณมั่นใจ ⚡</p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>ตรวจสอบวันล้างจาก lot no. ⚡</p>", unsafe_allow_html=True)
     
     # ==========================================
     # 🧭 SIDEBAR (CONTROL PANEL)
