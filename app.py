@@ -317,7 +317,7 @@ if st.session_state.current_app == "Main Menu":
     st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
     # Title ที่ใหญ่และเด่นขึ้น
     st.markdown("<p class='main-title'>📂 QAD Support Hub 🚀</p>", unsafe_allow_html=True)
-    st.markdown("<p class='center-text' style='color: #475569; font-size: 28px; font-weight: 500; font-family: Itim;'></p>", unsafe_allow_html=True)
+    st.markdown("<p class='center-text' style='color: #475569; font-size: 50px; font-weight: 500; font-family: Itim;'></p>", unsafe_allow_html=True)
     st.markdown("<div style='height: 70px;'></div>", unsafe_allow_html=True)
     
     # ดึงปุ่มมาตรงกลางหน้าจอ
