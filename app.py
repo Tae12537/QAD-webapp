@@ -80,33 +80,27 @@ def go_to_menu():
 # ==========================================
 def app_file_validator():
     st.markdown("<h2 style='text-align: center;'>📁 File Validator</h2>", unsafe_allow_html=True)
-    
     st.sidebar.markdown("### Menu")
     if st.sidebar.button("⬅️ Exit App"):
         go_to_menu()
-
     if 'reset_counter' not in st.session_state:
         st.session_state.reset_counter = 0
-
     def reset_app():
         for key in list(st.session_state.keys()):
             if key != "current_app": del st.session_state[key]
         st.session_state.reset_counter = st.session_state.get('reset_counter', 0) + 1
         st.rerun()
-
     st.sidebar.write("---")
     if st.sidebar.button("🔄 Reset This App"):
         reset_app()
 
     TARGET_SHEET = "RAMP v1.3"
-
     def get_column_letter(n):
         result = ""
         while n >= 0:
             result = chr(n % 26 + 65) + result
             n = n // 26 - 1
         return result
-
     def get_available_models():
         files = [f for f in os.listdir('.') if f.startswith('reference_') and (f.endswith('.xlsx') or f.endswith('.xlsm'))]
         return {f.replace('reference_', '').split('.')[0]: f for f in files}
@@ -114,68 +108,37 @@ def app_file_validator():
     try:
         available_models = get_available_models()
         model_list = ["-- Please Select --"] + sorted(list(available_models.keys()))
-        
         st.markdown("#### 1️⃣ Select Model")
         selected_model_name = st.selectbox("Select Model", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}", label_visibility="collapsed")
-
         if selected_model_name != "-- Please Select --":
             ref_filename = available_models[selected_model_name]
             st.markdown("#### 2️⃣ Upload File")
             uploaded_file = st.file_uploader("Upload", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}")
-
             if uploaded_file:
-                # --- Progress Bar Start ---
-                prog = st.progress(0)
-                stat = st.empty()
-                
-                stat.text("กำลังโหลดไฟล์และฐานข้อมูลอ้างอิง...")
                 wb = load_workbook(uploaded_file, data_only=False)
                 ws = wb[TARGET_SHEET]
                 df_ref = pd.read_excel(ref_filename, sheet_name=TARGET_SHEET, header=None).fillna("")
                 df_user = pd.read_excel(uploaded_file, sheet_name=TARGET_SHEET, header=None).fillna("")
-                prog.progress(30)
-                time.sleep(0.3)
-
-                stat.text("กำลังตรวจสอบหัวตาราง (F3/F5)...")
-                f_errors, missing_data, extra_data = [], {}, {}
-                d_errors, k_errors = [], []
-
+                f_errors, missing_data, extra_data, d_errors, k_errors = [], {}, {}, [], []
                 for r, c, label in [(2, 5, "F3"), (4, 5, "F5")]:
                     if str(df_user.iloc[r, c]).strip() != str(df_ref.iloc[r, c]).strip():
                         f_errors.append({"Position": label, "Found": df_user.iloc[r, c], "Target": df_ref.iloc[r, c]})
-                prog.progress(50)
-
-                stat.text("กำลังตรวจเช็ค Missing และ Extra Data...")
                 for r in range(76):
                     for c in range(df_ref.shape[1]):
                         if r >= 12 and c in [3, 10]: continue
-                        ref_v = str(df_ref.iloc[r, c]).strip()
-                        user_v = str(df_user.iloc[r, c]).strip()
+                        ref_v, user_v = str(df_ref.iloc[r, c]).strip(), str(df_user.iloc[r, c]).strip()
                         if ref_v != "" and (user_v == "" or user_v == "nan"):
                             missing_data.setdefault(get_column_letter(c), []).append(str(r+1))
                         elif ref_v == "" and (user_v != "" and user_v != "nan") and r+1 != 12:
                             extra_data.setdefault(get_column_letter(c), []).append(str(r+1))
-                prog.progress(75)
-
-                stat.text("กำลังตรวจรูปแบบวันที่และเวลา (D/K)...")
                 for row_idx in range(13, 77): 
                     for col_idx, (col_label, error_list) in enumerate(zip(['D', 'K'], [d_errors, k_errors])):
                         target_col = 4 if col_label == 'D' else 11
                         cell = ws.cell(row=row_idx, column=target_col)
                         if cell.value is not None:
                             fmt = str(cell.number_format).lower()
-                            has_date = ('y' in fmt) or ('d' in fmt and 'm' in fmt)
-                            has_time = ('h' in fmt)
-                            if not (has_date and has_time):
+                            if not (('y' in fmt or ('d' in fmt and 'm' in fmt)) and 'h' in fmt):
                                 error_list.append({"Row": row_idx, "Format": fmt, "Status": "❌ รูปแบบผิด (ต้องมีทั้งวันที่และเวลา)"})
-                
-                prog.progress(100)
-                stat.text("ตรวจสอบเสร็จสิ้น!")
-                time.sleep(0.5)
-                prog.empty()
-                stat.empty()
-                # --- Progress Bar End ---
-
                 st.markdown("### 📋 Result")
                 if not (f_errors or missing_data or extra_data or d_errors or k_errors):
                     st.balloons(); st.success("✅ ข้อมูลและรูปแบบถูกต้องทั้งหมด!")
@@ -183,18 +146,12 @@ def app_file_validator():
                     if f_errors: st.warning("⚠️ F3/F5 ไม่ตรง"); st.table(pd.DataFrame(f_errors))
                     if missing_data: st.info("⚠️ Missing Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
                     if extra_data: st.error("🚫 Extra Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
-                    
                     c1, c2 = st.columns(2)
                     with c1:
-                        st.markdown("**Column D**")
-                        if d_errors: st.dataframe(pd.DataFrame(d_errors))
-                        else: st.write("✅ ปกติ")
+                        st.markdown("**Column D**"); (st.dataframe(pd.DataFrame(d_errors)) if d_errors else st.write("✅ ปกติ"))
                     with c2:
-                        st.markdown("**Column K**")
-                        if k_errors: st.dataframe(pd.DataFrame(k_errors))
-                        else: st.write("✅ ปกติ")
+                        st.markdown("**Column K**"); (st.dataframe(pd.DataFrame(k_errors)) if k_errors else st.write("✅ ปกติ"))
     except Exception as e: st.error(f"Error: {e}")
-
 # ==========================================
 # APP 2: WASHING DATE PROCESSOR
 # ==========================================
