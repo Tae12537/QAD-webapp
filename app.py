@@ -116,24 +116,31 @@ def go_to_menu():
     st.rerun()
 
 # ==========================================
-# APP 1: FILE VALIDATOR
+# APP 1: FILE VALIDATOR (FIXED RESET MODEL)
 # ==========================================
 def app_file_validator():
     st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📁 File Validator</h1>", unsafe_allow_html=True)
     st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>ตรวจสอบ format ไฟล์ก่อนส่ง ✨</p>", unsafe_allow_html=True)
     
+    # ดึง reset_counter มาใช้ควบคุม widget
+    if 'reset_counter' not in st.session_state:
+        st.session_state.reset_counter = 0
+    
     with st.sidebar:
         st.markdown("### 🧭 Control Panel")
         if st.button("🏠 Home Menu", use_container_width=True):
             go_to_menu()
+        
+        # ปรับปรุงปุ่ม Refresh ให้ล้างค่าโมเดลด้วย
         if st.button("🔄 Refresh System", use_container_width=True):
+            # ลบค่าผลลัพธ์เดิมออก
             for key in list(st.session_state.keys()):
-                if key != "current_app": del st.session_state[key]
-            st.session_state.reset_counter = st.session_state.get('reset_counter', 0) + 1
+                if key not in ["current_app", "reset_counter", "uploader_key"]:
+                    del st.session_state[key]
+            
+            # เพิ่ม counter เพื่อเปลี่ยน Key ของ Selectbox ทำให้มันกลับไปค่าเริ่มต้น
+            st.session_state.reset_counter += 1
             st.rerun()
-
-    if 'reset_counter' not in st.session_state:
-        st.session_state.reset_counter = 0
 
     TARGET_SHEET = "RAMP v1.3"
 
@@ -154,11 +161,22 @@ def app_file_validator():
         
         c1, c2 = st.columns(2)
         with c1:
-            selected_model_name = st.selectbox("📍 Reference Model", model_list, index=0, key=f"v_sel_{st.session_state.reset_counter}")
+            # ใช้ key ที่ผูกกับ reset_counter เพื่อให้ Reset ค่าได้จริง
+            selected_model_name = st.selectbox(
+                "📍 Reference Model", 
+                model_list, 
+                index=0, 
+                key=f"model_selector_{st.session_state.reset_counter}"
+            )
         
         if selected_model_name != "-- เลือกโมเดลอ้างอิง --":
             with c2:
-                uploaded_file = st.file_uploader("📥 อัปโหลดไฟล์ที่ต้องการตรวจ", type=["xlsx", "xlsm"], key=f"v_up_{st.session_state.reset_counter}")
+                # ใช้ key ผูกกับ reset_counter เช่นกัน
+                uploaded_file = st.file_uploader(
+                    "📥 อัปโหลดไฟล์ที่ต้องการตรวจ", 
+                    type=["xlsx", "xlsm"], 
+                    key=f"file_v_{st.session_state.reset_counter}"
+                )
 
             if uploaded_file:
                 st.write("---")
@@ -233,7 +251,7 @@ def app_file_validator():
                             st.dataframe(pd.DataFrame(k_errors), use_container_width=True, hide_index=True)
                             
     except Exception as e: st.error(f"เกิดข้อผิดพลาด: {e}")
-
+        
 # ==========================================
 # APP 2: WASHING DATE PROCESSOR (ORIGINAL LOGIC + SIDEBAR RESET)
 # ==========================================
