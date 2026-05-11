@@ -252,7 +252,7 @@ def app_washing_processor():
         try: return pd.read_excel(file, engine="openpyxl", header=None)
         except: return pd.read_excel(file, engine="xlrd", header=None)
 
-    if st.button("🚀 EXECUTE PROCESSING", use_container_width=True):
+    if st.button("🚀 PROCESSING", use_container_width=True):
         if not file1 or not file2:
             st.warning("กรุณาอัปโหลดไฟล์ให้ครบถ้วน")
         else:
