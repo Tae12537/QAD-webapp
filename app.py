@@ -235,33 +235,39 @@ def app_file_validator():
     except Exception as e: st.error(f"เกิดข้อผิดพลาด: {e}")
 
 # ==========================================
-# APP 2: WASHING DATE PROCESSOR (ORIGINAL LOGIC + NEW UI)
+# APP 2: WASHING DATE PROCESSOR (ORIGINAL LOGIC + SIDEBAR RESET)
 # ==========================================
 def app_washing_processor():
     # ส่วนหัวและคำอธิบาย (UI ใหม่)
     st.markdown("<h1 class='center-text' style='color: #1e3a8a;'>📊 Washing Date Processor</h1>", unsafe_allow_html=True)
     st.markdown("<p class='center-text' style='color: #64748b; font-size: 20px;'>คำนวณวันล้างสินค้าด้วย Logic เดิมที่คุณมั่นใจ ⚡</p>", unsafe_allow_html=True)
     
+    # ==========================================
+    # 🧭 SIDEBAR (CONTROL PANEL)
+    # ==========================================
     with st.sidebar:
         st.markdown("### 🧭 Control Panel")
+        
+        # ปุ่มกลับหน้าหลัก
         if st.button("🏠 Home Menu", use_container_width=True):
             go_to_menu()
+            
+        # ย้ายปุ่ม Reset มาไว้ที่นี่ตามคำขอ
+        if st.button("🔄 Reset / Clear Data", use_container_width=True):
+            st.session_state.output = None
+            st.session_state.summary = None
+            st.session_state.file = None
+            st.session_state.uploader_key = st.session_state.get('uploader_key', 0) + 1
+            st.rerun()
 
     # =========================
-    # SESSION STATE & RESET
+    # SESSION STATE
     # =========================
     if "uploader_key" not in st.session_state:
         st.session_state.uploader_key = 0
 
-    if st.button("🔄 Reset / Clear Data", use_container_width=True):
-        st.session_state.output = None
-        st.session_state.summary = None
-        st.session_state.file = None
-        st.session_state.uploader_key += 1
-        st.rerun()
-
     # =========================
-    # UPLOAD UI
+    # UPLOAD UI (Layout สองคอลัมน์)
     # =========================
     col_u1, col_u2 = st.columns(2)
     with col_u1:
@@ -269,9 +275,9 @@ def app_washing_processor():
     with col_u2:
         file2 = st.file_uploader("📂 Upload File 2 (Runcard / Barcode)", type=["xls", "xlsx", "csv"], key=f"file2_{st.session_state.uploader_key}")
 
-    # =========================
+    # ==========================================
     # INTERNAL FUNCTIONS (YOUR ORIGINAL LOGIC)
-    # =========================
+    # ==========================================
     def read_excel(file):
         try: return pd.read_excel(file, engine="openpyxl", header=None)
         except: return pd.read_excel(file, engine="xlrd", header=None)
@@ -300,11 +306,14 @@ def app_washing_processor():
         if header_row is None:
             st.error("❌ หา header ไม่เจอ (Runcard / Barcode)")
             return pd.DataFrame()
+            
         df.columns = df.iloc[header_row]
         df = df[header_row + 1:]
         df.columns = df.columns.astype(str).str.strip().str.lower()
+        
         lot_cols = [c for c in df.columns if "runcard" in str(c).lower()]
         barcode_cols = [c for c in df.columns if "barcode" in str(c).lower()]
+        
         if len(lot_cols) == 0 or len(barcode_cols) == 0:
             st.error(f"❌ หา column ไม่เจอ\nColumns ที่มี: {list(df.columns)}")
             return pd.DataFrame()
@@ -350,7 +359,7 @@ def app_washing_processor():
         if file1 is None or file2 is None:
             st.warning("⚠️ กรุณาอัปโหลดไฟล์ให้ครบทั้ง 2 ช่อง")
         else:
-            with st.spinner('กำลังประมวลผล...'):
+            with st.spinner('กำลังประมวลผลตามขั้นตอน...'):
                 df1 = read_file1(file1)
                 df2 = read_file2(file2)
                 
@@ -361,7 +370,7 @@ def app_washing_processor():
                     merged["WW"] = pd.to_numeric(merged["WW"], errors="coerce")
                     merged["Day"] = pd.to_numeric(merged["Day"], errors="coerce")
                     
-                    # Load database.txt
+                    # โหลด database.txt
                     date_db = pd.read_csv("database.txt")
                     date_db["Date"] = pd.to_datetime(date_db["Date"], format="%d-%b-%Y", errors="coerce")
                     date_db["WW"] = pd.to_numeric(date_db["WW"], errors="coerce")
@@ -388,8 +397,8 @@ def app_washing_processor():
     # DISPLAY RESULTS
     # =========================
     if st.session_state.get("output") is not None:
-        st.success("✅ ประมวลผลสำเร็จ!")
-        tab1, tab2 = st.tabs(["📋 Result Detail", "📊 Summary"])
+        st.success("✅ Process สำเร็จ!")
+        tab1, tab2 = st.tabs(["📋 Result Detail", "📊 Summary View"])
         
         with tab1:
             st.dataframe(st.session_state.output, use_container_width=True)
