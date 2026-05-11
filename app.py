@@ -311,7 +311,7 @@ def app_washing_processor():
 # ==========================================
 if st.session_state.current_app == "Main Menu":
     st.markdown("<h1 style='text-align: center; font-size: 50px; margin-bottom: 10px;'>🏭 QAD System Hub</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b; font-size: 18px;'>ระบบจัดการและตรวจสอบข้อมูลการผลิตอัจฉริยะ</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b; font-size: 18px;'>Support Application for QAD</p>", unsafe_allow_html=True)
     st.write("---")
     
     # วางปุ่มใน Layout ที่สวยงาม
