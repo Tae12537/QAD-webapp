@@ -305,22 +305,22 @@ def app_washing_processor():
 if st.session_state.current_app == "Main Menu":
     st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
     st.markdown("<p class='main-title'>QAD System Hub</p>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b; font-size: 20px; font-weight: 300;'>Premium Internal Management Solution</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b; font-size: 20px; font-weight: 300;'>QAD Support Application</p>", unsafe_allow_html=True)
     st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
     
     col_l, c1, gap, c2, col_r = st.columns([0.4, 2, 0.3, 2, 0.4])
     
     with c1:
-        st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Data Integrity</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center; margin-bottom: 17px;'>ตรวจสอบ format ไฟล์ก่อนส่ง</h3>", unsafe_allow_html=True)
         if st.button("📁 File Validator"):
             st.session_state.current_app = "Validator"; st.rerun()
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 14px;'>ความแม่นยำคือหัวใจสำคัญ<br>ตรวจสอบ Format ไฟล์ RAMP ให้เป๊ะทุกจุด</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 14px;'></p>", unsafe_allow_html=True)
 
     with c2:
-        st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Efficiency Boost</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center; margin-bottom: 17px;'>ตรวจสอบวันล้าง</h3>", unsafe_allow_html=True)
         if st.button("📊 Washing Date Processor"):
             st.session_state.current_app = "Processor"; st.rerun()
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 14px;'>ลดเวลาการทำงานซ้ำซ้อน<br>จับคู่ข้อมูลและออกรายงานในคลิกเดียว</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 14px;'></p>", unsafe_allow_html=True)
 
     st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #cbd5e1; font-size: 12px;'>© 2026 QAD Engineering | System Excellence v2.5</p>", unsafe_allow_html=True)
