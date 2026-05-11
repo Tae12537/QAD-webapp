@@ -113,7 +113,7 @@ def app_file_validator():
                 if not (f_errors or missing_data or extra_data or d_errors or k_errors):
                     st.balloons(); st.success("✅ ข้อมูลและรูปแบบถูกต้องทั้งหมด!")
                 else:
-                    if f_errors: st.warning("⚠️ F3/F5 ไม่ตรง"); st.table(pd.DataFrame(f_errors))
+                    if f_errors: st.warning("⚠️ Par no./ Drawing no. ไม่ถูก (ช่อง F3/F5)"); st.table(pd.DataFrame(f_errors))
                     if missing_data: st.warning("⚠️ Missing Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
                     if extra_data: st.error("🚫 Extra Data"); st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
                     st.subheader("⏰ รูปแบบวันที่และเวลา")
