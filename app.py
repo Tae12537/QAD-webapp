@@ -117,7 +117,7 @@ def go_to_menu():
 # ==========================================
 def app_file_validator():
     st.markdown("<h1 style='text-align: center; color: #1e3a8a;'>📁 File Validator</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #64748b;'>ตรวจสอบโครงสร้างและความถูกต้องของไฟล์</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #64748b;'>ตรวจสอบ format ไฟล์ก่อนส่ง</p>", unsafe_allow_html=True)
     
     with st.sidebar:
         st.markdown("### 🧭 Control Panel")
@@ -167,10 +167,12 @@ def app_file_validator():
                     
                     f_errors, missing_data, extra_data, d_errors, k_errors = [], {}, {}, [], []
 
+                    # 1. Check Headers (F3/F5)
                     for r, c, label in [(2, 5, "F3"), (4, 5, "F5")]:
                         if str(df_user.iloc[r, c]).strip() != str(df_ref.iloc[r, c]).strip():
                             f_errors.append({"Position": label, "Found": df_user.iloc[r, c], "Target": df_ref.iloc[r, c]})
 
+                    # 2. Check Structural Data (Missing/Extra)
                     for r in range(76):
                         for c in range(df_ref.shape[1]):
                             if r >= 12 and c in [3, 10]: continue
@@ -180,6 +182,7 @@ def app_file_validator():
                             elif ref_v == "" and (user_v != "" and user_v != "nan") and r+1 != 12:
                                 extra_data.setdefault(get_column_letter(c), []).append(str(r+1))
 
+                    # 3. Check DateTime Format (Column D & K)
                     for row_idx in range(13, 77): 
                         for col_idx, (col_label, error_list) in enumerate(zip(['D', 'K'], [d_errors, k_errors])):
                             target_col = 4 if col_label == 'D' else 11
@@ -201,26 +204,37 @@ def app_file_validator():
                                     error_list.append({"Row": row_idx, "Value": str(val), "Status": reason})
                     status.update(label="Checking Complete!", state="complete", expanded=False)
 
+                # --- Error Display Section (Simplified like before) ---
                 if not (f_errors or missing_data or extra_data or d_errors or k_errors):
-                    st.balloons(); st.success("✨ ข้อมูลถูกต้องสมบูรณ์ 100%")
+                    st.balloons()
+                    st.success("✨ ข้อมูลถูกต้องสมบูรณ์ 100%")
                 else:
-                    if f_errors: st.warning("⚠️ หัวตารางไม่ตรง (F3/F5)"); st.table(pd.DataFrame(f_errors))
-                    
-                    res_c1, res_c2 = st.columns(2)
-                    with res_c1:
-                        if missing_data: 
-                            st.markdown("📉 **Missing Data**")
+                    if f_errors:
+                        st.error("⚠️ หัวตารางไม่ตรง (F3/F5)")
+                        st.table(pd.DataFrame(f_errors))
+
+                    # Layout for Missing and Extra Data
+                    col_mis, col_ext = st.columns(2)
+                    with col_mis:
+                        if missing_data:
+                            st.warning("📉 ข้อมูลที่หายไป (Missing Data)")
                             st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in missing_data.items()])
-                        if d_errors:
-                            st.markdown("🔍 **Washing Date Issues**")
-                            st.dataframe(pd.DataFrame(d_errors), use_container_width=True)
-                    with res_c2:
+                    with col_ext:
                         if extra_data:
-                            st.markdown("🚫 **Extra Data**")
+                            st.warning("🚫 ข้อมูลส่วนเกิน (Extra Data)")
                             st.table([{"Column": k, "Rows": ", ".join(v)} for k, v in extra_data.items()])
+
+                    # Layout for Date Format Errors
+                    col_d, col_k = st.columns(2)
+                    with col_d:
+                        if d_errors:
+                            st.error("🔍 ปัญหาที่คอลัมน์ Washing Date (D)")
+                            st.dataframe(pd.DataFrame(d_errors), use_container_width=True, hide_index=True)
+                    with col_k:
                         if k_errors:
-                            st.markdown("🔍 **Finish Date Issues**")
-                            st.dataframe(pd.DataFrame(k_errors), use_container_width=True)
+                            st.error("🔍 ปัญหาที่คอลัมน์ Finish Date (K)")
+                            st.dataframe(pd.DataFrame(k_errors), use_container_width=True, hide_index=True)
+                            
     except Exception as e: st.error(f"Error: {e}")
 
 # ==========================================
@@ -314,13 +328,11 @@ if st.session_state.current_app == "Main Menu":
         st.markdown("<h3 style='text-align: center; margin-bottom: 17px;'>ตรวจสอบ format ไฟล์ก่อนส่ง</h3>", unsafe_allow_html=True)
         if st.button("📁 File Validator"):
             st.session_state.current_app = "Validator"; st.rerun()
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 14px;'></p>", unsafe_allow_html=True)
 
     with c2:
         st.markdown("<h3 style='text-align: center; margin-bottom: 17px;'>ตรวจสอบวันล้าง</h3>", unsafe_allow_html=True)
         if st.button("📊 Washing Date Processor"):
             st.session_state.current_app = "Processor"; st.rerun()
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 14px;'></p>", unsafe_allow_html=True)
 
     st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #cbd5e1; font-size: 12px;'>© 2026 QAD Engineering | System Excellence v2.5</p>", unsafe_allow_html=True)
