@@ -300,7 +300,7 @@ if st.session_state.current_app == "Main Menu":
                 st.session_state.current_app = "Processor"; st.rerun()
 
     st.markdown("<div style='height: 100px;'></div>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 16px;'>© 2026 Quality Engineering | Systems v2.5 Sharp Edition ✨</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 16px;'>© 2026 Quality Engineering | Systems v2.0 ✨</p>", unsafe_allow_html=True)
 
 elif st.session_state.current_app == "Validator": app_file_validator()
 elif st.session_state.current_app == "Processor": app_washing_processor()
