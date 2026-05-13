@@ -15,52 +15,109 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Inter:wght@400;600;900&display=swap');
 
-    /* พื้นหลังสี Ivory อบอุ่น */
+    /* พื้นหลัง Animated Gradient ทรงพลัง */
     .stApp {
-        background-color: #fdfdfb;
-        color: #434343;
+        background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #f1f5f9, #cbd5e1);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+        color: #0f172a;
         font-family: 'Inter', 'Kanit', sans-serif;
     }
 
-    /* ปุ่มเมนูหลัก: เรียบหรูแบบนูนต่ำ (Neumorphism soft style) */
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Sidebar แบบกระจกฝ้าโปร่งแสง */
+    [data-testid="stSidebar"] {
+        background-color: rgba(255, 255, 255, 0.6) !important;
+        backdrop-filter: blur(15px);
+        border-right: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* ปุ่มเมนูหลัก: หรูหรา มีมิติ (Glassmorphism) */
     div.stButton > button:first-child {
-        background: #ffffff;
-        color: #1a1a1a;
-        border: none;
-        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.7);
+        color: #0f172a;
+        border: 1px solid rgba(15, 23, 42, 0.1);
+        border-radius: 0px; 
         height: 140px;
         font-size: 30px !important;
-        font-weight: 700;
-        box-shadow: 20px 20px 60px #d9d9d7, -20px -20px 60px #ffffff;
-        transition: all 0.3s ease;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.8);
+        backdrop-filter: blur(10px);
     }
 
     div.stButton > button:hover {
-        background: #fdfdfb;
-        box-shadow: inset 10px 10px 20px #d9d9d7, inset -10px -10px 20px #ffffff;
-        color: #c5a059 !important;
+        background: #0f172a;
+        color: #ffffff !important;
+        transform: translateY(-5px) scale(1.01);
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+        border: 1px solid #3b82f6;
     }
 
-    /* ชื่อแอปหลัก */
+    /* ชื่อแอปหลัก - คมชัดและมีระดับ */
     .main-title {
         font-family: 'Kanit', sans-serif;
         font-size: 80px;
         font-weight: 700;
-        color: #1a1a1a;
-        letter-spacing: -1px;
+        color: #0f172a;
         text-align: center;
+        line-height: 1.1;
+        margin-bottom: 10px;
     }
 
-    /* ปรับแต่งส่วนอื่นๆ */
+    .sub-title {
+        text-align: center;
+        color: #475569;
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 3rem;
+    }
+
+    /* ขนาดตัวหนังสือคงเดิมตามคำสั่ง */
+    p, label, .stMarkdown {
+        font-size: 19px !important;
+    }
+    
+    h3 {
+        font-size: 28px !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+    }
+
+    /* Tabs สไตล์ Glass */
+    .stTabs [data-baseweb="tab"] {
+        height: 60px;
+        font-size: 20px;
+        background-color: rgba(226, 232, 240, 0.5);
+        border-radius: 0px;
+        color: #475569;
+        padding: 0 40px;
+        backdrop-filter: blur(5px);
+    }
+
     .stTabs [aria-selected="true"] {
-        background-color: #c5a059 !important;
-        border-radius: 8px;
+        background-color: #0f172a !important;
+        color: #ffffff !important;
     }
 
-    .stDataFrame {
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid #eee !important;
+    /* Table & Data Handling */
+    [data-testid="stDataFrame"] {
+        border: 2px solid #0f172a !important;
+        background: white;
+    }
+    
+    /* File Uploader แบบ Industrial Glass */
+    .stFileUploader section {
+        border: 2px dashed #0f172a;
+        border-radius: 0px;
+        background-color: rgba(255, 255, 255, 0.5);
     }
     </style>
 """, unsafe_allow_html=True)
