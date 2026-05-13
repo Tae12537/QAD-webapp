@@ -11,113 +11,59 @@ from openpyxl import load_workbook
 # ==========================================
 st.set_page_config(page_title="QAD System Hub", layout="wide")
 
+# เปลี่ยนเฉพาะส่วน st.markdown(""" <style> ... </style> """) เป็นชุดนี้:
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Inter:wght@400;600;900&display=swap');
 
-    /* พื้นหลัง Animated Gradient ทรงพลัง */
+    /* พื้นหลังโทนน้ำเงินลึกไล่ระดับ */
     .stApp {
-        background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #f1f5f9, #cbd5e1);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        color: #0f172a;
+        background: radial-gradient(circle at top right, #1e293b, #0f172a, #020617);
+        color: #f1f5f9;
         font-family: 'Inter', 'Kanit', sans-serif;
     }
 
-    @keyframes gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    /* Sidebar แบบกระจกฝ้าโปร่งแสง */
-    [data-testid="stSidebar"] {
-        background-color: rgba(255, 255, 255, 0.6) !important;
-        backdrop-filter: blur(15px);
-        border-right: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    /* ปุ่มเมนูหลัก: หรูหรา มีมิติ (Glassmorphism) */
+    /* ปุ่มเมนูหลัก: ขอบทอง Metallic Glow */
     div.stButton > button:first-child {
-        background: rgba(255, 255, 255, 0.7);
-        color: #0f172a;
-        border: 1px solid rgba(15, 23, 42, 0.1);
-        border-radius: 0px; 
+        background: rgba(255, 255, 255, 0.03);
+        color: #f8fafc;
+        border: 1px solid rgba(234, 179, 8, 0.3);
+        border-radius: 4px;
         height: 140px;
         font-size: 30px !important;
         font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.8);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(20px);
+        transition: all 0.5s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     div.stButton > button:hover {
-        background: #0f172a;
-        color: #ffffff !important;
-        transform: translateY(-5px) scale(1.01);
-        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
-        border: 1px solid #3b82f6;
+        background: rgba(234, 179, 8, 0.1);
+        border: 1px solid #eab308;
+        box-shadow: 0 0 20px rgba(234, 179, 8, 0.2);
+        transform: translateY(-3px);
     }
 
-    /* ชื่อแอปหลัก - คมชัดและมีระดับ */
+    /* ชื่อแอปหลัก */
     .main-title {
         font-family: 'Kanit', sans-serif;
-        font-size: 80px;
+        font-size: 85px;
         font-weight: 700;
-        color: #0f172a;
+        background: linear-gradient(to bottom, #ffffff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         text-align: center;
-        line-height: 1.1;
-        margin-bottom: 10px;
     }
 
-    .sub-title {
-        text-align: center;
-        color: #475569;
-        font-size: 24px;
-        font-weight: 500;
-        margin-bottom: 3rem;
-    }
-
-    /* ขนาดตัวหนังสือคงเดิมตามคำสั่ง */
-    p, label, .stMarkdown {
-        font-size: 19px !important;
+    /* Sidebar & Containers */
+    [data-testid="stSidebar"] {
+        background-color: rgba(15, 23, 42, 0.8) !important;
+        backdrop-filter: blur(10px);
     }
     
-    h3 {
-        font-size: 28px !important;
-        font-weight: 700 !important;
-        color: #1e293b !important;
-    }
-
-    /* Tabs สไตล์ Glass */
-    .stTabs [data-baseweb="tab"] {
-        height: 60px;
-        font-size: 20px;
-        background-color: rgba(226, 232, 240, 0.5);
-        border-radius: 0px;
-        color: #475569;
-        padding: 0 40px;
-        backdrop-filter: blur(5px);
-    }
-
-    .stTabs [aria-selected="true"] {
-        background-color: #0f172a !important;
-        color: #ffffff !important;
-    }
-
-    /* Table & Data Handling */
-    [data-testid="stDataFrame"] {
-        border: 2px solid #0f172a !important;
-        background: white;
-    }
-    
-    /* File Uploader แบบ Industrial Glass */
-    .stFileUploader section {
-        border: 2px dashed #0f172a;
-        border-radius: 0px;
-        background-color: rgba(255, 255, 255, 0.5);
+    div[data-testid="stExpander"], .stTabs, .stFileUploader section {
+        background: rgba(255, 255, 255, 0.02) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
     </style>
 """, unsafe_allow_html=True)
