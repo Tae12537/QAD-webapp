@@ -11,59 +11,56 @@ from openpyxl import load_workbook
 # ==========================================
 st.set_page_config(page_title="QAD System Hub", layout="wide")
 
-# เปลี่ยนเฉพาะส่วน st.markdown(""" <style> ... </style> """) เป็นชุดนี้:
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&family=Inter:wght@400;600;900&display=swap');
 
-    /* พื้นหลังโทนน้ำเงินลึกไล่ระดับ */
+    /* พื้นหลังสี Ivory อบอุ่น */
     .stApp {
-        background: radial-gradient(circle at top right, #1e293b, #0f172a, #020617);
-        color: #f1f5f9;
+        background-color: #fdfdfb;
+        color: #434343;
         font-family: 'Inter', 'Kanit', sans-serif;
     }
 
-    /* ปุ่มเมนูหลัก: ขอบทอง Metallic Glow */
+    /* ปุ่มเมนูหลัก: เรียบหรูแบบนูนต่ำ (Neumorphism soft style) */
     div.stButton > button:first-child {
-        background: rgba(255, 255, 255, 0.03);
-        color: #f8fafc;
-        border: 1px solid rgba(234, 179, 8, 0.3);
-        border-radius: 4px;
+        background: #ffffff;
+        color: #1a1a1a;
+        border: none;
+        border-radius: 12px;
         height: 140px;
         font-size: 30px !important;
-        font-weight: 800;
-        backdrop-filter: blur(20px);
-        transition: all 0.5s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        font-weight: 700;
+        box-shadow: 20px 20px 60px #d9d9d7, -20px -20px 60px #ffffff;
+        transition: all 0.3s ease;
     }
 
     div.stButton > button:hover {
-        background: rgba(234, 179, 8, 0.1);
-        border: 1px solid #eab308;
-        box-shadow: 0 0 20px rgba(234, 179, 8, 0.2);
-        transform: translateY(-3px);
+        background: #fdfdfb;
+        box-shadow: inset 10px 10px 20px #d9d9d7, inset -10px -10px 20px #ffffff;
+        color: #c5a059 !important;
     }
 
     /* ชื่อแอปหลัก */
     .main-title {
         font-family: 'Kanit', sans-serif;
-        font-size: 85px;
+        font-size: 80px;
         font-weight: 700;
-        background: linear-gradient(to bottom, #ffffff, #94a3b8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #1a1a1a;
+        letter-spacing: -1px;
         text-align: center;
     }
 
-    /* Sidebar & Containers */
-    [data-testid="stSidebar"] {
-        background-color: rgba(15, 23, 42, 0.8) !important;
-        backdrop-filter: blur(10px);
+    /* ปรับแต่งส่วนอื่นๆ */
+    .stTabs [aria-selected="true"] {
+        background-color: #c5a059 !important;
+        border-radius: 8px;
     }
-    
-    div[data-testid="stExpander"], .stTabs, .stFileUploader section {
-        background: rgba(255, 255, 255, 0.02) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    .stDataFrame {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #eee !important;
     }
     </style>
 """, unsafe_allow_html=True)
