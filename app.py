@@ -293,7 +293,7 @@ def app_washing_processor():
 if st.session_state.current_app == "Main Menu":
     st.markdown("<div style='height: 80px;'></div>", unsafe_allow_html=True)
     st.markdown("<p class='main-title'>QAD SYSTEM HUB</p>", unsafe_allow_html=True)
-    st.markdown("<p class='sub-title'>📂 Quality Engineering Support Application 🚀</p>", unsafe_allow_html=True)
+    st.markdown("<p class='sub-title'>📂 QE Support Application 🚀</p>", unsafe_allow_html=True)
     
     _, col_main, _ = st.columns([0.1, 0.8, 0.1])
     
